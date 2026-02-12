@@ -377,13 +377,19 @@
                     
                     // 遍历筛选后的数据，添加标记
                     filteredData.forEach(item => {
+                        // 根据文物类型选择图标
+                        let iconUrl = 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png';
+                        if (item.cultural_relic_type && item.cultural_relic_type.includes('古墓葬')) {
+                            iconUrl = 'img/古墓.png';
+                        }
+                        
                         // 创建标记
                         const marker = new AMap.Marker({
                             position: [item.longitude, item.latitude],
                             title: item.name,
                             icon: new AMap.Icon({
                                 size: new AMap.Size(32, 32),
-                                image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+                                image: iconUrl,
                                 imageSize: new AMap.Size(32, 32)
                             })
                         });

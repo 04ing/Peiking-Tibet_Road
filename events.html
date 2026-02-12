@@ -6,6 +6,8 @@
     <title>历史事件脉络梳理 - 京藏古道人文环境时空信息开放平台</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vis-timeline@7.4.9/standalone/umd/vis-timeline-graph2d.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/vis-timeline@7.4.9/styles/vis-timeline-graph2d.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- 顶部导航栏 -->
@@ -69,114 +71,205 @@
     <section class="timeline">
         <div class="container">
             <h2>历史事件时间线</h2>
-            <div class="timeline-content">
-                <!-- 元代初期 -->
-                <div class="timeline-period">
-                    <h3>元代初期（1206-1271）</h3>
-                    <div class="timeline-events">
-                        <div class="timeline-event">
-                            <div class="event-date">1206年</div>
-                            <div class="event-content">
-                                <h4>成吉思汗建立蒙古汗国</h4>
-                                <p>铁木真统一蒙古各部，建立蒙古汗国，为后来的京藏古道建设奠定了政治基础。</p>
-                            </div>
-                        </div>
-                        <div class="timeline-event">
-                            <div class="event-date">1227年</div>
-                            <div class="event-content">
-                                <h4>蒙古灭西夏，控制河西走廊</h4>
-                                <p>蒙古军队灭亡西夏，控制了河西走廊地区，为连接中原与西藏的交通奠定了基础。</p>
-                            </div>
-                        </div>
-                        <div class="timeline-event">
-                            <div class="event-date">1239年</div>
-                            <div class="event-content">
-                                <h4>蒙古军入藏</h4>
-                                <p>蒙古皇子阔端派军进入西藏，与西藏地方势力建立联系。</p>
-                            </div>
-                        </div>
-                        <div class="timeline-event">
-                            <div class="event-date">1247年</div>
-                            <div class="event-content">
-                                <h4>凉州会盟</h4>
-                                <p>萨迦派领袖萨班与蒙古皇子阔端在凉州（今甘肃武威）举行会盟，西藏正式归属蒙古汗国管辖，京藏古道开始形成。</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 元代中期 -->
-                <div class="timeline-period">
-                    <h3>元代中期（1271-1333）</h3>
-                    <div class="timeline-events">
-                        <div class="timeline-event">
-                            <div class="event-date">1271年</div>
-                            <div class="event-content">
-                                <h4>忽必烈建立元朝</h4>
-                                <p>忽必烈定国号为元，建立元朝，定都大都（今北京），京藏古道的起点正式确立。</p>
-                            </div>
-                        </div>
-                        <div class="timeline-event">
-                            <div class="event-date">1279年</div>
-                            <div class="event-content">
-                                <h4>元朝统一中国</h4>
-                                <p>元朝灭亡南宋，统一中国，为京藏古道的全面建设创造了条件。</p>
-                            </div>
-                        </div>
-                        <div class="timeline-event">
-                            <div class="event-date">1280年</div>
-                            <div class="event-content">
-                                <h4>设置吐蕃等处宣慰司都元帅府</h4>
-                                <p>元朝在西藏地区设置吐蕃等处宣慰司都元帅府，加强对西藏的管辖，京藏古道的管理体系初步形成。</p>
-                            </div>
-                        </div>
-                        <div class="timeline-event">
-                            <div class="event-date">1292年</div>
-                            <div class="event-content">
-                                <h4>开通大都至西藏的驿路</h4>
-                                <p>元朝正式开通从大都（今北京）至西藏的驿路，设置驿站，建立了完整的驿传体系。</p>
-                            </div>
-                        </div>
-                        <div class="timeline-event">
-                            <div class="event-date">1304年</div>
-                            <div class="event-content">
-                                <h4>修订驿路管理制度</h4>
-                                <p>元朝修订驿路管理制度，明确驿站的职责和运行机制，提高了京藏古道的运行效率。</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 元代晚期 -->
-                <div class="timeline-period">
-                    <h3>元代晚期（1333-1368）</h3>
-                    <div class="timeline-events">
-                        <div class="timeline-event">
-                            <div class="event-date">1333年</div>
-                            <div class="event-content">
-                                <h4>元顺帝即位</h4>
-                                <p>元顺帝妥懽帖睦尔即位，此时京藏古道已成为连接内地与西藏的重要通道。</p>
-                            </div>
-                        </div>
-                        <div class="timeline-event">
-                            <div class="event-date">1351年</div>
-                            <div class="event-content">
-                                <h4>红巾军起义爆发</h4>
-                                <p>红巾军起义爆发，元朝统治开始动摇，京藏古道的管理受到影响。</p>
-                            </div>
-                        </div>
-                        <div class="timeline-event">
-                            <div class="event-date">1368年</div>
-                            <div class="event-content">
-                                <h4>明朝建立，元朝灭亡</h4>
-                                <p>朱元璋建立明朝，元朝灭亡，京藏古道的元代历史结束，进入明朝管理时期。</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div id="event-timeline"></div>
         </div>
     </section>
+
+    <script>
+        // 历史事件数据
+        const eventsData = [
+            {
+                id: 1,
+                content: '成吉思汗建立蒙古汗国',
+                title: '成吉思汗建立蒙古汗国',
+                description: '铁木真统一蒙古各部，建立蒙古汗国，为后来的京藏古道建设奠定了政治基础。',
+                start: new Date(1206, 0, 1),
+                type: 'point',
+                className: 'timeline-point'
+            },
+            {
+                id: 2,
+                content: '蒙古灭西夏，控制河西走廊',
+                title: '蒙古灭西夏，控制河西走廊',
+                description: '蒙古军队灭亡西夏，控制了河西走廊地区，为连接中原与西藏的交通奠定了基础。',
+                start: new Date(1227, 0, 1),
+                type: 'point',
+                className: 'timeline-point'
+            },
+            {
+                id: 3,
+                content: '蒙古军入藏',
+                title: '蒙古军入藏',
+                description: '蒙古皇子阔端派军进入西藏，与西藏地方势力建立联系。',
+                start: new Date(1239, 0, 1),
+                type: 'point',
+                className: 'timeline-point'
+            },
+            {
+                id: 4,
+                content: '凉州会盟',
+                title: '凉州会盟',
+                description: '萨迦派领袖萨班与蒙古皇子阔端在凉州（今甘肃武威）举行会盟，西藏正式归属蒙古汗国管辖，京藏古道开始形成。',
+                impact: '确立了西藏与中央政权的隶属关系，开启了京藏之间的政治、经济、文化交流。',
+                start: new Date(1247, 0, 1),
+                type: 'point',
+                className: 'timeline-point key-event'
+            },
+            {
+                id: 5,
+                content: '忽必烈建立元朝',
+                title: '忽必烈建立元朝',
+                description: '忽必烈定国号为元，建立元朝，定都大都（今北京），京藏古道的起点正式确立。',
+                start: new Date(1271, 0, 1),
+                type: 'point',
+                className: 'timeline-point'
+            },
+            {
+                id: 6,
+                content: '元朝统一中国',
+                title: '元朝统一中国',
+                description: '元朝灭亡南宋，统一中国，为京藏古道的全面建设创造了条件。',
+                start: new Date(1279, 0, 1),
+                type: 'point',
+                className: 'timeline-point'
+            },
+            {
+                id: 7,
+                content: '设置吐蕃等处宣慰司都元帅府',
+                title: '设置吐蕃等处宣慰司都元帅府',
+                description: '元朝在西藏地区设置吐蕃等处宣慰司都元帅府，加强对西藏的管辖，京藏古道的管理体系初步形成。',
+                start: new Date(1280, 0, 1),
+                type: 'point',
+                className: 'timeline-point'
+            },
+            {
+                id: 8,
+                content: '开通大都至西藏的驿路',
+                title: '开通大都至西藏的驿路',
+                description: '元朝正式开通从大都（今北京）至西藏的驿路，设置驿站，建立了完整的驿传体系。',
+                impact: '形成了连接内地与西藏的官方通道，促进了两地之间的人员往来和物资交流。',
+                start: new Date(1292, 0, 1),
+                type: 'point',
+                className: 'timeline-point key-event'
+            },
+            {
+                id: 9,
+                content: '修订驿路管理制度',
+                title: '修订驿路管理制度',
+                description: '元朝修订驿路管理制度，明确驿站的职责和运行机制，提高了京藏古道的运行效率。',
+                impact: '完善了驿路管理体系，保障了京藏古道的畅通，促进了沿线地区的发展。',
+                start: new Date(1304, 0, 1),
+                type: 'point',
+                className: 'timeline-point key-event'
+            },
+            {
+                id: 10,
+                content: '元顺帝即位',
+                title: '元顺帝即位',
+                description: '元顺帝妥懽帖睦尔即位，此时京藏古道已成为连接内地与西藏的重要通道。',
+                start: new Date(1333, 0, 1),
+                type: 'point',
+                className: 'timeline-point'
+            },
+            {
+                id: 11,
+                content: '红巾军起义爆发',
+                title: '红巾军起义爆发',
+                description: '红巾军起义爆发，元朝统治开始动摇，京藏古道的管理受到影响。',
+                start: new Date(1351, 0, 1),
+                type: 'point',
+                className: 'timeline-point'
+            },
+            {
+                id: 12,
+                content: '明朝建立，元朝灭亡',
+                title: '明朝建立，元朝灭亡',
+                description: '朱元璋建立明朝，元朝灭亡，京藏古道的元代历史结束，进入明朝管理时期。',
+                start: new Date(1368, 0, 1),
+                type: 'point',
+                className: 'timeline-point'
+            }
+        ];
+
+        // 初始化时间轴
+        function initTimeline() {
+            const container = document.getElementById('event-timeline');
+            const options = {
+                showCurrentTime: false,
+                zoomable: true,
+                orientation: 'top',
+                tooltip: {
+                    followMouse: true,
+                    overflowMethod: 'cap',
+                    content: function(item) {
+                        return `<div class="tooltip-content">
+                            <h4>${item.title}</h4>
+                            <p>${item.description}</p>
+                            ${item.impact ? `<p><strong>历史影响：</strong>${item.impact}</p>` : ''}
+                        </div>`;
+                    }
+                },
+                start: new Date(1200, 0, 1),
+                end: new Date(1370, 0, 1),
+                min: new Date(1190, 0, 1),
+                max: new Date(1380, 0, 1),
+                // 自定义点样式
+                itemStyle: function(item) {
+                    return {
+                        className: item.className
+                    };
+                }
+            };
+            
+            const timeline = new vis.Timeline(container, eventsData, options);
+            
+            // 添加点击事件，点击点时弹出详细信息
+            timeline.on('click', function(props) {
+                if (props.item) {
+                    const item = eventsData.find(event => event.id === props.item);
+                    if (item) {
+                        // 创建自定义弹窗
+                        const modal = document.createElement('div');
+                        modal.className = 'custom-modal';
+                        modal.innerHTML = `
+                            <div class="custom-modal-overlay"></div>
+                            <div class="custom-modal-dialog">
+                                <div class="custom-modal-content">
+                                    <div class="custom-modal-header">
+                                        <h5 class="custom-modal-title">${item.title}</h5>
+                                        <button type="button" class="custom-modal-close">&times;</button>
+                                    </div>
+                                    <div class="custom-modal-body">
+                                        <div>
+                                            <p>${item.description}</p>
+                                            ${item.impact ? `<div class="event-impact"><h4>历史影响：</h4><p>${item.impact}</p></div>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.body.appendChild(modal);
+                        modal.style.display = 'block';
+                        
+                        // 关闭弹窗
+                        modal.querySelector('.custom-modal-close').addEventListener('click', function() {
+                            modal.style.display = 'none';
+                            document.body.removeChild(modal);
+                        });
+                        
+                        // 点击背景关闭弹窗
+                        modal.querySelector('.custom-modal-overlay').addEventListener('click', function() {
+                            modal.style.display = 'none';
+                            document.body.removeChild(modal);
+                        });
+                    }
+                }
+            });
+        }
+
+        // 页面加载完成后初始化时间轴
+        window.addEventListener('DOMContentLoaded', initTimeline);
+    </script>
 
     <!-- 重要历史事件 -->
     <section class="key-events">
