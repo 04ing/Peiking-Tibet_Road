@@ -334,11 +334,17 @@
         function loadJingzangRouteData(map) {
             console.log('尝试加载京藏古道路线数据...');
             
-            // 模拟京藏古道路线数据
-            var jingzangRouteData = {
-                type: 'FeatureCollection',
-                features: [
-                    {
+            // 从JSON文件加载数据
+            fetch('json/route-data.json')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('路线数据加载成功:', data);
+                    
+                    // 构建GeoJSON格式的数据
+                    var features = [];
+                    
+                    // 添加主线
+                    features.push({
                         type: 'Feature',
                         properties: {
                             name: '京藏古道主线',
@@ -346,39 +352,146 @@
                         },
                         geometry: {
                             type: 'LineString',
-                            coordinates: [
-                                [116.4074, 39.9042], // 北京
-                                [114.5149, 38.0428], // 石家庄
-                                [112.5389, 37.8706], // 太原
-                                [111.6567, 40.8184], // 呼和浩特
-                                [106.2782, 38.4664], // 银川
-                                [103.8235, 36.0581], // 兰州
-                                [101.7783, 36.6232], // 西宁
-                                [91.1175, 29.6475]   // 拉萨
-                            ]
+                            coordinates: data.mainRoute
                         }
-                    }
-                ]
+                    });
+                    
+                    // 添加支线
+                    data.branchRoutes.forEach(function(branch, index) {
+                        features.push({
+                            type: 'Feature',
+                            properties: {
+                                name: branch.name,
+                                description: branch.desc
+                            },
+                            geometry: {
+                                type: 'LineString',
+                                coordinates: branch.path
+                            }
+                        });
+                    });
+                    
+                    // 添加节点标记
+                    data.nodes.forEach(function(node) {
+                        var marker = L.marker([node.lat, node.lng])
+                            .bindPopup('<b>' + node.name + '</b><br>' + node.desc);
+                        marker.addTo(map);
+                    });
+                    
+                    // 创建GeoJSON数据结构
+                    var jingzangRouteData = {
+                        type: 'FeatureCollection',
+                        features: features
+                    };
+                    
+                    // 创建路线图层
+                    jingzangRouteLayer = L.geoJSON(jingzangRouteData, {
+                        style: function(feature) {
+                            // 主线使用不同的样式
+                            if (feature.properties.name === '京藏古道主线') {
+                                return {
+                                    color: '#8B4513',
+                                    weight: 6,
+                                    opacity: 0.9,
+                                    dashArray: '5, 5'
+                                };
+                            } else {
+                                // 支线使用不同的样式
+                                return {
+                                    color: '#CD853F',
+                                    weight: 4,
+                                    opacity: 0.7,
+                                    dashArray: '10, 10'
+                                };
+                            }
+                        },
+                        onEachFeature: function(feature, layer) {
+                            if (feature.properties && feature.properties.name) {
+                                layer.bindPopup('<b>' + feature.properties.name + '</b><br>' + feature.properties.description);
+                            }
+                        }
+                    }).addTo(map);
+                    
+                    // 更新图表数据
+                    updateChart(data);
+                    
+                    console.log('京藏古道路线数据加载完成');
+                })
+                .catch(error => {
+                    console.error('加载路线数据失败:', error);
+                    showGlobalError('数据加载失败，请刷新页面重试');
+                });
+        }
+        
+        // 更新图表数据
+        function updateChart(data) {
+            console.log('更新图表数据...');
+            
+            // 统计各省份的节点数量
+            var provinceStats = {
+                '北京': 0,
+                '河北': 0,
+                '山西': 0,
+                '内蒙古': 0,
+                '宁夏': 0,
+                '甘肃': 0,
+                '青海': 0,
+                '西藏': 0
             };
             
-            // 创建路线图层
-            jingzangRouteLayer = L.geoJSON(jingzangRouteData, {
-                style: function(feature) {
-                    return {
-                        color: '#8B4513',
-                        weight: 5,
-                        opacity: 0.8,
-                        dashArray: '5, 5'
-                    };
-                },
-                onEachFeature: function(feature, layer) {
-                    if (feature.properties && feature.properties.name) {
-                        layer.bindPopup('<b>' + feature.properties.name + '</b><br>' + feature.properties.description);
-                    }
-                }
-            }).addTo(map);
+            // 简单的省份归属判断（基于经纬度）
+            data.nodes.forEach(function(node) {
+                var lng = node.lng;
+                var lat = node.lat;
+                
+                if (lng > 115 && lat > 39) provinceStats['北京']++;
+                else if (lng > 114 && lat > 38) provinceStats['河北']++;
+                else if (lng > 111 && lat > 36) provinceStats['山西']++;
+                else if (lng > 108 && lat > 40) provinceStats['内蒙古']++;
+                else if (lng > 105 && lat > 37) provinceStats['宁夏']++;
+                else if (lng > 100 && lat > 35) provinceStats['甘肃']++;
+                else if (lng > 95 && lat > 32) provinceStats['青海']++;
+                else if (lng < 95 || lat < 32) provinceStats['西藏']++;
+            });
             
-            console.log('京藏古道路线数据加载完成');
+            // 更新图表
+            if (yuanChart) {
+                var provinces = Object.keys(provinceStats);
+                var stationCounts = Object.values(provinceStats);
+                
+                yuanChart.setOption({
+                    xAxis: {
+                        data: provinces
+                    },
+                    series: [
+                        {
+                            data: stationCounts,
+                            type: 'bar',
+                            itemStyle: {
+                                color: '#8B4513'
+                            }
+                        },
+                        {
+                            data: stationCounts,
+                            type: 'line',
+                            smooth: true,
+                            lineStyle: {
+                                color: '#8B4513',
+                                width: 3
+                            },
+                            symbol: 'circle',
+                            symbolSize: 8,
+                            itemStyle: {
+                                color: '#8B4513',
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            }
+                        }
+                    ]
+                });
+                
+                console.log('图表数据更新完成');
+            }
         }
 
         // 检查瓦片服务器可访问性
