@@ -4,57 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>全国著名古墓葬分布图</title>
-    <link href="https://fastly.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vis-timeline@7.4.9/standalone/umd/vis-timeline-graph2d.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/vis-timeline@7.4.9/styles/vis-timeline-graph2d.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        #map {height: 600px; width: 100%; margin-bottom: 30px;}
-        #timeline {
-            height: 600px;
-            width: 95%;
-            margin: 2rem auto;
-            font-family: 'Microsoft YaHei';
-            background: rgba(255,255,255,0.95);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            padding: 15px;
-        }
-        
-        /* 时间轴条样式 */
-        .vis-item.vis-range {
-            background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%);
-            border: none;
-            border-radius: 8px;
-            opacity: 0.9;
-            height: 40px !important;
-        }
-        
-        .vis-time-axis .vis-grid.vis-vertical {
-            border-left: 2px dashed rgba(139, 69, 19, 0.3);
-        }
-        .time-marker {
-            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(245,245,245,0.95));
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border: 1px solid rgba(139, 69, 19, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        
-        .time-marker:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-        
-        .time-marker h5 {
-            color: #8B4513;
-        }
-    </style>
 </head>
 <body>
     <!-- 顶部导航栏 -->
@@ -87,11 +42,13 @@
     </section>
 
     <div class="container">
-        <div class="map-controls" style="position: absolute; top: 120px; right: 30px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
-            <form id="searchForm" class="d-flex">
+        <div class="search-map-controls">
+            <form id="searchForm" class="d-flex mb-3">
                 <input id="searchInput" class="form-control me-2" type="search" placeholder="输入古墓名称搜索" aria-label="搜索">
                 <button class="btn-primary" type="submit">搜索</button>
             </form>
+            <button id="filter-jingzang" class="btn-primary w-100 mb-2">显示京藏古道沿线墓葬</button>
+            <button id="show-all" class="btn-secondary w-100">显示所有墓葬</button>
             <div id="searchAlert" class="mt-2 d-none alert alert-warning"></div>
         </div>
         <div id="map"></div>
@@ -106,6 +63,9 @@
         }).addTo(map);
 
         let relicsData = [];
+        let routeData = null;
+        let allMarkers = [];
+        let routeLayers = [];
 
         async function loadCulturalRelics() {
             relicsData = await (await fetch('./json/cultural-relics.json')).json();
@@ -117,6 +77,11 @@
                 longitude: parseFloat(relic.longitude),
                 latitude: parseFloat(relic.latitude)
             }));
+        }
+
+        async function loadRouteData() {
+            routeData = await (await fetch('./json/route-data.json')).json();
+            return routeData;
         }
 
         function createMarker(relic) {
@@ -142,6 +107,117 @@
             return marker;
         }
 
+        function haversineDistance(coords1, coords2) {
+            const R = 6371; // 地球半径（公里）
+            const dLat = (coords2.lat - coords1.lat) * Math.PI / 180;
+            const dLng = (coords2.lng - coords1.lng) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(coords1.lat * Math.PI / 180) * Math.cos(coords2.lat * Math.PI / 180) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function isNearRoute(relic, maxDistance = 50) {
+            if (!routeData) return false;
+
+            // 检查是否靠近主线
+            for (const point of routeData.mainRoute) {
+                const distance = haversineDistance(
+                    { lat: relic.latitude, lng: relic.longitude },
+                    { lat: point[1], lng: point[0] }
+                );
+                if (distance < maxDistance) return true;
+            }
+
+            // 检查是否靠近支线
+            for (const branch of routeData.branchRoutes) {
+                for (const point of branch.path) {
+                    const distance = haversineDistance(
+                        { lat: relic.latitude, lng: relic.longitude },
+                        { lat: point[1], lng: point[0] }
+                    );
+                    if (distance < maxDistance) return true;
+                }
+            }
+
+            return false;
+        }
+
+        function clearAllMarkers() {
+            allMarkers.forEach(marker => map.removeLayer(marker));
+            allMarkers = [];
+        }
+
+        function clearRouteLayers() {
+            routeLayers.forEach(layer => map.removeLayer(layer));
+            routeLayers = [];
+        }
+
+        function drawRoutes() {
+            if (!routeData) return;
+
+            // 绘制主线
+            const mainRouteLayer = L.polyline(
+                routeData.mainRoute.map(point => [point[1], point[0]]),
+                {
+                    color: '#8B4513',
+                    weight: 4,
+                    opacity: 0.8,
+                    dashArray: ''
+                }
+            ).addTo(map);
+            routeLayers.push(mainRouteLayer);
+
+            // 为主线添加信息弹窗
+            mainRouteLayer.bindPopup('京藏古道主线');
+
+            // 绘制支线
+            routeData.branchRoutes.forEach(branch => {
+                const branchLayer = L.polyline(
+                    branch.path.map(point => [point[1], point[0]]),
+                    {
+                        color: '#D2B48C',
+                        weight: 3,
+                        opacity: 0.6,
+                        dashArray: '5, 5'
+                    }
+                ).addTo(map);
+                routeLayers.push(branchLayer);
+
+                // 为支线添加信息弹窗
+                branchLayer.bindPopup(`${branch.name}<br>${branch.desc}`);
+            });
+        }
+
+        function showAllTombs() {
+            clearAllMarkers();
+            clearRouteLayers();
+            relicsData.forEach(relic => {
+                const marker = createMarker(relic);
+                marker.addTo(map);
+                allMarkers.push(marker);
+            });
+            map.fitBounds(relicsData.map(r => [r.latitude, r.longitude]));
+        }
+
+        function showJingzangTombs() {
+            clearAllMarkers();
+            clearRouteLayers();
+            const jingzangTombs = relicsData.filter(relic => isNearRoute(relic));
+            jingzangTombs.forEach(relic => {
+                const marker = createMarker(relic);
+                marker.addTo(map);
+                allMarkers.push(marker);
+            });
+            drawRoutes();
+            if (jingzangTombs.length > 0) {
+                map.fitBounds(jingzangTombs.map(r => [r.latitude, r.longitude]));
+            } else {
+                alert('未找到京藏古道沿线的墓葬');
+            }
+        }
+
         document.getElementById('searchForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const searchValue = document.getElementById('searchInput').value.trim();
@@ -162,29 +238,32 @@
             }
         });
 
-        loadCulturalRelics().then(relics => {
-            const validRelics = relics;
-            console.log(`有效文物数据：${validRelics.length}/${relics.length}`);
-            validRelics.forEach(relic => {
-                const marker = createMarker(relic);
-                marker.addTo(map);
-            });
-            map.fitBounds(relics.map(r => [r.latitude, r.longitude]));
+        document.getElementById('filter-jingzang').addEventListener('click', showJingzangTombs);
+        document.getElementById('show-all').addEventListener('click', showAllTombs);
+
+        // 加载数据
+        Promise.all([loadCulturalRelics(), loadRouteData()]).then(([relics, routes]) => {
+            relicsData = relics;
+            routeData = routes;
+            console.log(`有效文物数据：${relics.length}`);
+            console.log('路线数据加载完成');
+            showAllTombs();
         }).catch(error => {
-            console.error('古墓葬数据加载失败:', error);
-            alert('古墓葬数据加载失败，请检查网络连接后刷新页面');
+            console.error('数据加载失败:', error);
+            alert('数据加载失败，请检查网络连接后刷新页面');
         });
 
     </script>
     <!-- 文物详情模态框 -->
-<div class="modal fade" id="relicsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div id="relicsModal" class="custom-modal">
+    <div class="custom-modal-overlay"></div>
+    <div class="custom-modal-dialog">
+        <div class="custom-modal-content">
+            <div class="custom-modal-header">
+                <h5 class="custom-modal-title"></h5>
+                <button type="button" class="custom-modal-close">&times;</button>
             </div>
-            <div class="modal-body row row-cols-1 row-cols-md-2 g-4">
+            <div class="custom-modal-body">
                 <!-- 文物卡片动态加载 -->
             </div>
         </div>
@@ -198,11 +277,13 @@
 
    
     <script>
-        // 显示模态框方法
+        // 自定义模态框实现
         function showRelicsModal(dynasty, relics) {
-            const modal = new bootstrap.Modal(document.getElementById('relicsModal'));
-            const modalTitle = document.querySelector('#relicsModal .modal-title');
-            const modalBody = document.querySelector('#relicsModal .modal-body');
+            const modal = document.getElementById('relicsModal');
+            const modalTitle = modal.querySelector('.custom-modal-title');
+            const modalBody = modal.querySelector('.custom-modal-body');
+            const modalClose = modal.querySelector('.custom-modal-close');
+            const modalOverlay = modal.querySelector('.custom-modal-overlay');
             
             modalTitle.textContent = `${dynasty}时期古墓葬（共${relics.length}件）`;
             modalBody.innerHTML = relics.map(relic => `
@@ -217,7 +298,14 @@
                 </div>
             `).join('');
             
-            modal.show();
+            modal.style.display = 'block';
+            
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+            
+            modalClose.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', closeModal);
         }
 
         // 加载朝代文物数据
@@ -313,37 +401,7 @@ async function loadDynastyData() {
             });
         }).catch(error => {
             console.error('时间轴数据加载失败:', error);
-            // 显示模态框方法
-function showRelicsModal(dynasty, relics) {
-    const modal = new bootstrap.Modal(document.getElementById('relicsModal'));
-    const modalTitle = document.querySelector('#relicsModal .modal-title');
-    const modalBody = document.querySelector('#relicsModal .modal-body');
-    
-    modalTitle.textContent = `${dynasty}时期古墓葬（共${relics.length}件）`;
-    modalBody.innerHTML = relics.map(relic => `
-        <div class="relic-card">
-            <h6>${relic.name || '未命名古墓葬'}</h6>
-            ${relic.image ? `<img src="./img/${relic.image}" alt="${relic.name}">` : ''}
-            <p class="mt-2 text-muted">
-                <span>批次：${relic.batch || '未知'}</span><br>
-                <span>地址：${relic.address || '地址不详'}</span>
-            </p>
-            ${relic.remarks ? `<p class="text-truncate">${relic.remarks}</p>` : ''}
-        </div>
-    `).join('');
-    
-    modal.show();
-}
-
-alert('数据加载失败，请检查网络连接');
-        });
-    </script>
-    <script>
-        // DOM加载完成后初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 确保模态框组件初始化
-            const modalEl = document.getElementById('relicsModal');
-            new bootstrap.Modal(modalEl);
+            alert('数据加载失败，请检查网络连接');
         });
     </script>
     
@@ -379,7 +437,6 @@ alert('数据加载失败，请检查网络连接');
         </div>
     </footer>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
