@@ -109,4 +109,4 @@
 ## 联系方式
 
 - 邮箱：contact@jzgd-platform.org
-- 电话：010-12345678
+- 电话：XXX-XXXXXXXX
