@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全国著名古墓葬分布图</title>
+    <link href="https://fastly.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vis-timeline@7.4.9/standalone/umd/vis-timeline-graph2d.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/vis-timeline@7.4.9/styles/vis-timeline-graph2d.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #map {height: 600px; width: 100%; margin-bottom: 30px;}
+        #timeline {
+            height: 600px;
+            width: 95%;
+            margin: 2rem auto;
+            font-family: 'Microsoft YaHei';
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 15px;
+        }
+        
+        /* 时间轴条样式 */
+        .vis-item.vis-range {
+            background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%);
+            border: none;
+            border-radius: 8px;
+            opacity: 0.9;
+            height: 40px !important;
+        }
+        
+        .vis-time-axis .vis-grid.vis-vertical {
+            border-left: 2px dashed rgba(139, 69, 19, 0.3);
+        }
+        .time-marker {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(245,245,245,0.95));
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(139, 69, 19, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        .time-marker:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .time-marker h5 {
+            color: #8B4513;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>京藏古道人文环境时空信息开放平台</h1>
+                <p>元代北京至西藏的驿路文明</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="index.html#explore">古道探索</a></li>
+                    <li><a href="index.html#map">地图展示</a></li>
+                    <li><a href="index.html#dataset">数据集</a></li>
+                    <li><a href="culture.html">文化内涵</a></li>
+                    <li><a href="travel.html">旅游攻略</a></li>
+                    <li><a href="index.html#about">关于平台</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 页面标题 -->
+    <section class="page-header">
+        <div class="container">
+            <h1>全国著名古墓葬分布图</h1>
+            <p>探索中国古代墓葬的分布与历史文化价值</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="map-controls" style="position: absolute; top: 120px; right: 30px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+            <form id="searchForm" class="d-flex">
+                <input id="searchInput" class="form-control me-2" type="search" placeholder="输入古墓名称搜索" aria-label="搜索">
+                <button class="btn-primary" type="submit">搜索</button>
+            </form>
+            <div id="searchAlert" class="mt-2 d-none alert alert-warning"></div>
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <script>
+        const map = L.map('map').setView([35, 105], 4);
+        L.tileLayer('https://webst0{s}.is.autonavi.com/appmaptile?style=7&x={x}&y={y}&z={z}', {
+            subdomains: ['1','2','3','4'],
+            attribution: '高德地图',
+            detectRetina: true
+        }).addTo(map);
+
+        let relicsData = [];
+
+        async function loadCulturalRelics() {
+            relicsData = await (await fetch('./json/cultural-relics.json')).json();
+            return relicsData.filter(relic => 
+                relic.longitude && relic.latitude &&
+                !isNaN(relic.longitude) && !isNaN(relic.latitude)
+            ).map(relic => ({
+                ...relic,
+                longitude: parseFloat(relic.longitude),
+                latitude: parseFloat(relic.latitude)
+            }));
+        }
+
+        function createMarker(relic) {
+            const marker = L.marker([relic.latitude, relic.longitude], {
+                icon: L.icon({
+                    iconUrl: './img/古墓.png',
+                    iconSize: [32, 32],
+                    popupAnchor: [0, -15]
+                })
+            });
+
+            // 创建信息窗口模板
+            marker.bindPopup(`
+                <div class="info-window">
+                    <h4>${relic.name || '未命名墓葬'}</h4>
+                    <p>时代：${relic.era || '未知'}</p>
+                    <p>批次：${relic.batch || '未知'}</p>
+                    <p>地址：${relic.address || '地址不详'}</p>
+                    ${relic.remarks ? `<p>简介：${relic.remarks}</p>` : ''}
+                </div>
+            `);
+
+            return marker;
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const searchValue = document.getElementById('searchInput').value.trim();
+            const foundRelic = relicsData.find(relic => 
+                relic.name && relic.name.includes(searchValue)
+            );
+
+            if (foundRelic) {
+                console.log('定位坐标：', foundRelic.latitude, foundRelic.longitude);
+                map.flyTo([foundRelic.latitude, foundRelic.longitude], 15);
+                const marker = createMarker(foundRelic);
+                marker.addTo(map).openPopup();
+            } else {
+                const alertDiv = document.getElementById('searchAlert');
+                alertDiv.textContent = searchValue ? '未找到匹配的古墓葬' : '请输入搜索内容';
+                alertDiv.classList.remove('d-none');
+                setTimeout(() => alertDiv.classList.add('d-none'), 2000);
+            }
+        });
+
+        loadCulturalRelics().then(relics => {
+            const validRelics = relics;
+            console.log(`有效文物数据：${validRelics.length}/${relics.length}`);
+            validRelics.forEach(relic => {
+                const marker = createMarker(relic);
+                marker.addTo(map);
+            });
+            map.fitBounds(relics.map(r => [r.latitude, r.longitude]));
+        }).catch(error => {
+            console.error('古墓葬数据加载失败:', error);
+            alert('古墓葬数据加载失败，请检查网络连接后刷新页面');
+        });
+
+    </script>
+    <!-- 文物详情模态框 -->
+<div class="modal fade" id="relicsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body row row-cols-1 row-cols-md-2 g-4">
+                <!-- 文物卡片动态加载 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+        <h2 class="text-center mb-4">在时间轴上点击相应模块即查看该朝代所有古墓葬</h2>
+        <div id="timeline"></div>
+    </div>
+
+   
+    <script>
+        // 显示模态框方法
+        function showRelicsModal(dynasty, relics) {
+            const modal = new bootstrap.Modal(document.getElementById('relicsModal'));
+            const modalTitle = document.querySelector('#relicsModal .modal-title');
+            const modalBody = document.querySelector('#relicsModal .modal-body');
+            
+            modalTitle.textContent = `${dynasty}时期古墓葬（共${relics.length}件）`;
+            modalBody.innerHTML = relics.map(relic => `
+                <div class="relic-card">
+                    <h6>${relic.name || '未命名古墓葬'}</h6>
+                    ${relic.image ? `<img src="./img/${relic.image}" alt="${relic.name}">` : ''}
+                    <p class="mt-2 text-muted">
+                        <span>批次：${relic.batch || '未知'}</span><br>
+                        <span>地址：${relic.address || '地址不详'}</span>
+                    </p>
+                    ${relic.remarks ? `<p class="text-truncate">${relic.remarks}</p>` : ''}
+                </div>
+            `).join('');
+            
+            modal.show();
+        }
+
+        // 加载朝代文物数据
+        // 全局朝代映射关系
+const dynastyMap = {
+    '夏': '夏朝', '商': '商朝', '周': '周朝', '秦': '秦朝',
+    '汉': '汉朝', '三国': '三国时期', '晋': '晋朝', '南北朝': '南北朝',
+    '隋': '隋朝', '唐': '唐朝', '宋': '宋朝', '元': '元朝',
+    '明': '明朝', '清': '清朝'
+};
+
+async function loadDynastyRelics(dynasty) {
+    const relics = await (await fetch('./json/cultural-relics.json')).json();
+    return relics.filter(relic => {
+        const rawDynasty = relic.era || '未知';
+        return dynastyMap[rawDynasty] === dynasty;
+    });
+}
+
+async function loadDynastyData() {
+            const relics = await (await fetch('./json/cultural-relics.json')).json();
+            
+            // 朝代标准化处理
+            const dynastyMap = {
+                '夏': '夏朝', '商': '商朝', '周': '周朝', '秦': '秦朝',
+                '汉': '汉朝', '三国': '三国时期', '晋': '晋朝', '南北朝': '南北朝',
+                '隋': '隋朝', '唐': '唐朝', '宋': '宋朝', '元': '元朝',
+                '明': '明朝', '清': '清朝'
+            };
+
+            // 朝代时间范围数据
+            const dynastyPeriods = {
+                '夏朝': [-2070, -1600],
+                '商朝': [-1600, -1046],
+                '周朝': [-1046, -256],
+                '秦朝': [-221, -206],
+                '汉朝': [-202, 220],
+                '三国时期': [220, 280],
+                '晋朝': [265, 420],
+                '南北朝': [420, 589],
+                '隋朝': [581, 618],
+                '唐朝': [618, 907],
+                '宋朝': [960, 1279],
+                '元朝': [1271, 1368],
+                '明朝': [1368, 1644],
+                '清朝': [1636, 1912]
+            };
+
+            // 统计朝代文物数量
+            const dynastyCounts = relics.reduce((acc, relic) => {
+                const rawDynasty = relic.era || '未知';
+                const dynasty = dynastyMap[rawDynasty] || rawDynasty;
+                if (dynastyPeriods[dynasty]) {
+                    acc[dynasty] = (acc[dynasty] || 0) + 1;
+                }
+                return acc;
+            }, {});
+
+            // 生成时间轴条目
+            return Object.entries(dynastyPeriods).map(([dynasty, [start, end]]) => ({
+                id: dynasty,
+                content: `<div class="time-marker">
+                    <h5>${dynasty}</h5>
+                    <p>古墓葬数量: ${dynastyCounts[dynasty] || 0}件</p>
+                </div>`,
+                start: new Date(start, 0, 1),
+                end: new Date(end, 0, 1),
+                type: 'range'
+            }));
+        }
+
+        loadDynastyData().then(items => {
+            const container = document.getElementById('timeline');
+            const options = {
+                showCurrentTime: false,
+                zoomable: true,
+                orientation: 'both',
+                tooltip: {
+                    followMouse: true,
+                    overflowMethod: 'cap'
+                }
+            };
+            
+            const timeline = new vis.Timeline(container, items, options);
+
+            // 添加点击事件监听
+            timeline.on('click', async (props) => {
+                if(props.item) {
+                    const dynasty = items.find(item => item.id === props.item).id;
+                    const relics = await loadDynastyRelics(dynasty);
+                    showRelicsModal(dynasty, relics);
+                }
+            });
+        }).catch(error => {
+            console.error('时间轴数据加载失败:', error);
+            // 显示模态框方法
+function showRelicsModal(dynasty, relics) {
+    const modal = new bootstrap.Modal(document.getElementById('relicsModal'));
+    const modalTitle = document.querySelector('#relicsModal .modal-title');
+    const modalBody = document.querySelector('#relicsModal .modal-body');
+    
+    modalTitle.textContent = `${dynasty}时期古墓葬（共${relics.length}件）`;
+    modalBody.innerHTML = relics.map(relic => `
+        <div class="relic-card">
+            <h6>${relic.name || '未命名古墓葬'}</h6>
+            ${relic.image ? `<img src="./img/${relic.image}" alt="${relic.name}">` : ''}
+            <p class="mt-2 text-muted">
+                <span>批次：${relic.batch || '未知'}</span><br>
+                <span>地址：${relic.address || '地址不详'}</span>
+            </p>
+            ${relic.remarks ? `<p class="text-truncate">${relic.remarks}</p>` : ''}
+        </div>
+    `).join('');
+    
+    modal.show();
+}
+
+alert('数据加载失败，请检查网络连接');
+        });
+    </script>
+    <script>
+        // DOM加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 确保模态框组件初始化
+            const modalEl = document.getElementById('relicsModal');
+            new bootstrap.Modal(modalEl);
+        });
+    </script>
+    
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>京藏古道人文环境时空信息开放平台</h3>
+                    <p>元代北京至西藏的驿路文明</p>
+                </div>
+                <div class="footer-links">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="index.html#explore">古道探索</a></li>
+                        <li><a href="index.html#map">地图展示</a></li>
+                        <li><a href="index.html#dataset">数据集</a></li>
+                        <li><a href="culture.html">文化内涵</a></li>
+                        <li><a href="travel.html">旅游攻略</a></li>
+                        <li><a href="index.html#about">关于平台</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>联系方式</h4>
+                    <p>邮箱：contact@jzgd-platform.org</p>
+                    <p>电话：010-12345678</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 京藏古道人文环境时空信息开放平台 版权所有</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
