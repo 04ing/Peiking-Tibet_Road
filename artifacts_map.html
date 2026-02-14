@@ -396,7 +396,7 @@ async function loadDynastyData() {
                 // 添加日期标签
                 const dateElement = document.createElement('div');
                 dateElement.className = 'event-date';
-                dateElement.textContent = item.id;
+                dateElement.innerHTML = `${item.id}<br><span style="font-size: 10px; font-weight: normal;">${item.content.match(/古墓葬数量: (\d+)件/) ? item.content.match(/古墓葬数量: (\d+)件/)[1] : 0}件</span>`;
                 eventElement.appendChild(dateElement);
                 
                 // 添加事件点
