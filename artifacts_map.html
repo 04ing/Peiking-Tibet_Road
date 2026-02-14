@@ -6,9 +6,8 @@
     <title>全国著名古墓葬分布图</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vis-timeline@7.4.9/standalone/umd/vis-timeline-graph2d.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/vis-timeline@7.4.9/styles/vis-timeline-graph2d.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/timeline.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -379,26 +378,43 @@ async function loadDynastyData() {
 
         loadDynastyData().then(items => {
             const container = document.getElementById('timeline');
-            const options = {
-                showCurrentTime: false,
-                zoomable: true,
-                orientation: 'both',
-                tooltip: {
-                    followMouse: true,
-                    overflowMethod: 'cap'
-                }
-            };
             
-            const timeline = new vis.Timeline(container, items, options);
-
-            // 添加点击事件监听
-            timeline.on('click', async (props) => {
-                if(props.item) {
-                    const dynasty = items.find(item => item.id === props.item).id;
+            // 创建时间轴容器
+            const timelineContainer = document.createElement('div');
+            timelineContainer.className = 'custom-timeline';
+            
+            // 创建事件容器
+            const eventsContainer = document.createElement('div');
+            eventsContainer.className = 'timeline-events';
+            timelineContainer.appendChild(eventsContainer);
+            
+            // 添加朝代事件
+            items.forEach(item => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'timeline-event';
+                
+                // 添加日期标签
+                const dateElement = document.createElement('div');
+                dateElement.className = 'event-date';
+                dateElement.textContent = item.id;
+                eventElement.appendChild(dateElement);
+                
+                // 添加事件点
+                const pointElement = document.createElement('div');
+                pointElement.className = 'event-point';
+                eventElement.appendChild(pointElement);
+                
+                eventsContainer.appendChild(eventElement);
+                
+                // 添加点击事件
+                pointElement.addEventListener('click', async function() {
+                    const dynasty = item.id;
                     const relics = await loadDynastyRelics(dynasty);
                     showRelicsModal(dynasty, relics);
-                }
+                });
             });
+            
+            container.appendChild(timelineContainer);
         }).catch(error => {
             console.error('时间轴数据加载失败:', error);
             alert('数据加载失败，请检查网络连接');
