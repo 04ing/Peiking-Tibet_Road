@@ -353,7 +353,9 @@
                     setTimeout(moveCar, 1000);
                 } else {
                     // 动画结束后重新开始
-                    i = 0;
+                    i = 1;
+                    // 将小车重置到起点
+                    carMarker.setPosition(routeData.mainRoute[0]);
                     setTimeout(moveCar, 1000);
                 }
             }
@@ -517,7 +519,11 @@
                     setTimeout(moveCar, 1000);
                 } else {
                     // 动画结束后重新开始
-                    i = 0;
+                    i = 1;
+                    // 将小车重置到起点
+                    car.transition()
+                        .duration(500)
+                        .attr('transform', `translate(${routePoints[0].x}, ${routePoints[0].y}) rotate(0)`);
                     setTimeout(moveCar, 1000);
                 }
             }
