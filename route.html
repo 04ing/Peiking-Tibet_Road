@@ -657,67 +657,23 @@
                     .attr('class', 'horse')
                     .style('opacity', 1); // 立即显示，不使用过渡
                 
-                // 使用更形象、更大的马匹图标
+                // 使用非常大、非常明显的马匹图标
                 const horseGroup = horse.append('g')
-                    .attr('transform', 'scale(4)'); // 进一步增大尺寸
+                    .attr('transform', 'scale(6)'); // 显著增大尺寸
                 
-                // 绘制马头
+                // 绘制一个非常明显的红色圆点作为标记
                 horseGroup.append('circle')
                     .attr('cx', 0)
                     .attr('cy', 0)
-                    .attr('r', 5)
-                    .style('fill', '#8B4513')
+                    .attr('r', 10)
+                    .style('fill', '#ff0000')
                     .style('stroke', '#000')
-                    .style('stroke-width', 1);
-                
-                // 绘制马身
-                horseGroup.append('ellipse')
-                    .attr('cx', 15)
-                    .attr('cy', 0)
-                    .attr('rx', 10)
-                    .attr('ry', 5)
-                    .style('fill', '#8B4513')
-                    .style('stroke', '#000')
-                    .style('stroke-width', 1);
-                
-                // 绘制马腿
-                const legs = [[10, 5], [18, 5], [10, 8], [18, 8]];
-                legs.forEach((leg, index) => {
-                    horseGroup.append('line')
-                        .attr('x1', leg[0])
-                        .attr('y1', 0)
-                        .attr('x2', leg[0])
-                        .attr('y2', leg[1])
-                        .style('stroke', '#8B4513')
-                        .style('stroke-width', 2);
-                });
-                
-                // 绘制马尾
-                horseGroup.append('path')
-                    .attr('d', 'M25,0 Q30,-5 28,5')
-                    .style('fill', 'none')
-                    .style('stroke', '#8B4513')
                     .style('stroke-width', 2);
                 
-                // 绘制马耳
+                // 添加一个简单的箭头表示方向
                 horseGroup.append('path')
-                    .attr('d', 'M-3,-5 L-5,-10 L-1,-10 Z')
-                    .style('fill', '#8B4513');
-                horseGroup.append('path')
-                    .attr('d', 'M3,-5 L5,-10 L1,-10 Z')
-                    .style('fill', '#8B4513');
-                
-                // 绘制马眼
-                horseGroup.append('circle')
-                    .attr('cx', -3)
-                    .attr('cy', -2)
-                    .attr('r', 1)
-                    .style('fill', 'white');
-                horseGroup.append('circle')
-                    .attr('cx', 3)
-                    .attr('cy', -2)
-                    .attr('r', 1)
-                    .style('fill', 'white');
+                    .attr('d', 'M15,0 L25,5 L25,-5 Z')
+                    .style('fill', '#000');
                 
                 // 确保路线点数组创建正确
                 console.log('路线点数量:', route.length);
@@ -731,10 +687,20 @@
                 console.log('动画点数量:', routePoints.length);
                 console.log('第一个点坐标:', routePoints[0]);
                 
+                // 添加一个明显的标记，显示初始位置
+                svg.append('circle')
+                    .attr('cx', routePoints[0].x)
+                    .attr('cy', routePoints[0].y)
+                    .attr('r', 8)
+                    .style('fill', '#ffff00')
+                    .style('stroke', '#000')
+                    .style('stroke-width', 2)
+                    .style('opacity', 0.7);
+                
                 // 设置初始位置
                 const firstPoint = routePoints[0];
                 horse.attr('transform', `translate(${firstPoint.x}, ${firstPoint.y}) rotate(0)`);
-                console.log('马匹初始位置设置完成');
+                console.log('马匹初始位置设置完成，实际位置:', firstPoint.x, firstPoint.y);
                 
                 // 立即开始动画，不等待过渡结束
                 let i = 0;
@@ -752,10 +718,21 @@
                         
                         // 直接更新马匹位置和方向，不使用transition
                         horse.attr('transform', `translate(${point.x}, ${point.y}) rotate(${angle})`);
+                        console.log('马匹移动到位置:', point.x, point.y, '角度:', angle);
+                        
+                        // 添加临时标记点，显示马匹经过的位置
+                        svg.append('circle')
+                            .attr('cx', point.x)
+                            .attr('cy', point.y)
+                            .attr('r', 4)
+                            .style('fill', '#00ff00')
+                            .style('stroke', '#000')
+                            .style('stroke-width', 1)
+                            .style('opacity', 0.5);
                         
                         i++;
                         // 减慢动画速度
-                        setTimeout(moveHorse, 1000); // 进一步减慢
+                        setTimeout(moveHorse, 1500); // 进一步减慢，确保我们能看到
                     } else {
                         // 动画结束，隐藏马匹
                         horse.style('opacity', 0);
