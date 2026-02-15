@@ -73,8 +73,9 @@
     <section class="main-routes">
         <div class="container">
             <h2>主要路线</h2>
-            <div class="route-map" style="height: 600px; margin-bottom: 30px;">
+            <div class="route-map" style="height: 600px; margin-bottom: 30px; position: relative;">
                 <div id="amap-container" style="width: 100%; height: 100%;"></div>
+                <div id="d3-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
             </div>
             <div class="route-details">
                 <div class="route-section">
@@ -148,101 +149,34 @@
                 </div>
                 <div class="branch-item">
                     <h3>玉树至康定支线</h3>
-                    <p>连接玉树与康定，是京藏古道与川藏道的连接通道。</p>
+                    <p>连接玉树与康定，是京藏古道与川藏古道的重要连接。</p>
                 </div>
                 <div class="branch-item">
-                    <h3>拉萨至日喀则支线</h3>
-                    <p>连接拉萨与日喀则，是京藏古道向西藏南部延伸的重要支线。</p>
+                    <h3>昌都至云南支线</h3>
+                    <p>连接昌都与云南，是京藏古道与滇藏古道的交汇点。</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 重要节点 -->
-    <section class="key-nodes">
-        <div class="container">
-            <h2>重要节点</h2>
-            <div class="nodes-grid">
-                <div class="node-item">
-                    <h3>居庸关</h3>
-                    <p>位于北京西北，是京藏古道出京的第一重要关口，素有"天下第一雄关"之称。</p>
-                </div>
-                <div class="node-item">
-                    <h3>大同</h3>
-                    <p>元代称为大同路，是京藏古道的重要枢纽，连接中原与草原。</p>
-                </div>
-                <div class="node-item">
-                    <h3>兰州</h3>
-                    <p>元代称为兰州路，是京藏古道进入西北地区的重要节点。</p>
-                </div>
-                <div class="node-item">
-                    <h3>西宁</h3>
-                    <p>元代称为西宁州，是京藏古道进入青藏高原的门户。</p>
-                </div>
-                <div class="node-item">
-                    <h3>玉树</h3>
-                    <p>元代称为朵甘思，是京藏古道在青藏高原的重要驿站。</p>
-                </div>
-                <div class="node-item">
-                    <h3>拉萨</h3>
-                    <p>元代称为萨斯迦，是京藏古道的终点，西藏地区的政治、宗教中心。</p>
-                </div>
-            </div>
-        </div>
-    </section>
+
 
     <!-- 路线可视化 -->
     <section class="route-visualization">
         <div class="container">
             <h2>路线可视化</h2>
-            <p>基于D3.js的平滑动态路线可视化，展示京藏古道的完整路线网络：</p>
+            <p>基于D3.js实现的路线动态可视化，展示小车沿京藏古道从北京到拉萨的行程：</p>
             <div id="d3-route-container" style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 30px;"></div>
         </div>
     </section>
 
-    <!-- 复原成果 -->
-    <section class="route-results">
-        <div class="container">
-            <h2>复原成果</h2>
-            <div class="results-content">
-                <div class="result-item">
-                    <h3>路线地图</h3>
-                    <p>基于历史文献和考古资料，复原了元代京藏古道的完整路线图，包括主线和支线，共计约4300公里。</p>
-                </div>
-                <div class="result-item">
-                    <h3>驿站体系</h3>
-                    <p>复原了沿线100余个驿站的位置和功能，构建了完整的驿站体系数据库。</p>
-                </div>
-                <div class="result-item">
-                    <h3>行程指南</h3>
-                    <p>根据历史文献记载，复原了从北京至拉萨的详细行程，包括每日行程距离、宿营地和重要景观。</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 参考文献 -->
-    <section class="references">
-        <div class="container">
-            <h2>参考文献</h2>
-            <ul>
-                <li>《元史》，中华书局，1976年</li>
-                <li>《经世大典》辑本，中华书局，1992年</li>
-                <li>《永乐大典》残卷，中华书局，1986年</li>
-                <li>陈得芝：《元代交通史》，人民交通出版社，2003年</li>
-                <li>王颋：《元代驿站制度研究》，上海古籍出版社，2005年</li>
-                <li>西藏自治区交通厅：《西藏古近代交通史》，人民交通出版社，1994年</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- 页脚 -->
+    <!-- 底部信息 -->
     <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-info">
                     <h3>京藏古道人文环境时空信息开放平台</h3>
-                    <p>元代北京至西藏的驿路文明</p>
+                    <p>致力于元代京藏古道的历史研究与数字化保护</p>
                 </div>
                 <div class="footer-links">
                     <h4>快速链接</h4>
@@ -254,203 +188,200 @@
                         <li><a href="index.html#about">关于平台</a></li>
                     </ul>
                 </div>
-                <div class="footer-contact">
-                    <h4>联系方式</h4>
-                    <p>邮箱：contact@jzgd-platform.org</p>
-                    <p>电话：010-12345678</p>
-                </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 京藏古道人文环境时空信息开放平台 版权所有</p>
+                <p>&copy; 2024 京藏古道人文环境时空信息开放平台. 保留所有权利.</p>
             </div>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
     <script>
-        // 检查高德地图API是否加载成功
-        if (typeof AMap === 'undefined') {
-            console.error('高德地图API加载失败');
-            document.getElementById('amap-container').innerHTML = 
-                '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">高德地图API加载失败，请检查网络连接</div>';
-        } else {
-            console.log('高德地图API加载成功');
-            
-            // 检查插件是否加载成功
-            console.log('AMap.ToolBar是否可用:', typeof AMap.ToolBar !== 'undefined');
-            console.log('AMap.Scale是否可用:', typeof AMap.Scale !== 'undefined');
-            
-            // 初始化高德地图
-            var map = new AMap.Map('amap-container', {
-                center: [103.834303, 36.061101], // 兰州附近作为中心点
+        // 路线数据变量
+        let routeData = {};
+
+        // 从JSON文件加载数据
+        async function loadRouteData() {
+            try {
+                const response = await fetch('json/route-data.json');
+                routeData = await response.json();
+                console.log('路线数据加载成功:', routeData);
+                return routeData;
+            } catch (error) {
+                console.error('加载路线数据失败:', error);
+                // 使用默认数据作为备用
+                return {
+                    nodes: [
+                        { name: '大都（今北京）', lng: 116.4074, lat: 39.9042, desc: '元代首都，京藏古道起点' },
+                        { name: '居庸关', lng: 116.0568, lat: 40.3576, desc: '位于北京西北，是京藏古道出京的第一重要关口' },
+                        { name: '大同', lng: 113.2986, lat: 40.1173, desc: '元代称为大同路，是京藏古道的重要枢纽' },
+                        { name: '兰州', lng: 103.8343, lat: 36.0611, desc: '元代称为兰州路，是京藏古道进入西北地区的重要节点' },
+                        { name: '西宁', lng: 101.7786, lat: 36.6232, desc: '元代称为西宁州，是京藏古道进入青藏高原的门户' },
+                        { name: '拉萨', lng: 91.1175, lat: 29.6508, desc: '元代称为萨斯迦，是京藏古道的终点' }
+                    ],
+                    mainRoute: [
+                        [116.4074, 39.9042],
+                        [116.0568, 40.3576],
+                        [115.032, 40.6234],
+                        [114.5566, 40.8184],
+                        [113.2986, 40.1173],
+                        [112.5493, 37.857],
+                        [111.6708, 38.0428],
+                        [110.9734, 36.6683],
+                        [109.752, 34.3416],
+                        [108.9402, 34.3416],
+                        [107.5731, 34.3416],
+                        [106.1133, 33.8512],
+                        [105.7111, 34.5646],
+                        [104.3586, 36.0396],
+                        [103.8343, 36.0611],
+                        [103.2424, 36.7328],
+                        [102.4548, 36.8207],
+                        [101.7786, 36.6232],
+                        [101.6721, 36.313],
+                        [100.6195, 36.27],
+                        [99.9743, 35.8833],
+                        [98.2364, 34.9128],
+                        [97.0381, 33.0172],
+                        [97.1761, 31.1341],
+                        [94.8852, 30.0382],
+                        [91.1175, 29.6508]
+                    ],
+                    branchRoutes: []
+                };
+            }
+        };
+
+        // 初始化高德地图
+        function initAMap() {
+            const map = new AMap.Map('amap-container', {
                 zoom: 5,
-                mapStyle: 'amap://styles/whitesmoke'
+                center: [104.0668, 30.5728],
+                mapStyle: 'amap://styles/light'
             });
-            
-            console.log('地图初始化成功:', map);
-            
-            // 检查文件路径是否正确
-            console.log('当前页面URL:', window.location.href);
-            
-            // 从JSON文件加载路线数据
-            fetch('json/route-data.json')
-                .then(response => {
-                    console.log('fetch响应状态:', response.status);
-                    if (!response.ok) {
-                        throw new Error('HTTP错误，状态码: ' + response.status);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('路线数据加载成功:', data);
-                    
-                    // 检查数据结构
-                    console.log('nodes长度:', data.nodes ? data.nodes.length : '未定义');
-                    console.log('mainRoute长度:', data.mainRoute ? data.mainRoute.length : '未定义');
-                    console.log('branchRoutes长度:', data.branchRoutes ? data.branchRoutes.length : '未定义');
-                    
-                    // 获取数据
-                    const nodes = data.nodes;
-                    const mainRoute = data.mainRoute;
-                    const branchRoutes = data.branchRoutes;
-                    
-                    // 绘制主要路线
-                    console.log('开始绘制主要路线...');
-                    var mainPolyline = new AMap.Polyline({
-                        path: mainRoute,
-                        strokeColor: '#1890ff',
-                        strokeWeight: 6,
-                        strokeOpacity: 0.8,
-                        strokeStyle: 'solid'
-                    });
-                    
-                    // 为主要路线添加点击事件
-                    mainPolyline.on('click', function() {
-                        var infoWindow = new AMap.InfoWindow({
-                            content: '<h3>京藏古道主线</h3><p>元代北京至西藏的主要驿路，全长约4300公里，连接了中原与西藏地区。</p>',
-                            offset: new AMap.Pixel(0, -30)
-                        });
-                        infoWindow.open(map, mainRoute[Math.floor(mainRoute.length / 2)]);
-                    });
-                    
-                    mainPolyline.setMap(map);
-                    console.log('主要路线绘制完成:', mainPolyline);
-                    
-                    // 绘制支线
-                    console.log('开始绘制支线...');
-                    branchRoutes.forEach(function(branch, index) {
-                        console.log('绘制支线', index + 1, branch.name);
-                        var polyline = new AMap.Polyline({
-                            path: branch.path,
-                            strokeColor: '#52c41a',
-                            strokeWeight: 4,
-                            strokeOpacity: 0.6,
-                            strokeStyle: 'dashed'
-                        });
-                        
-                        // 为支线添加点击事件
-                        polyline.on('click', function() {
-                            var infoWindow = new AMap.InfoWindow({
-                                content: '<h3>' + branch.name + '</h3><p>' + branch.desc + '</p>',
-                                offset: new AMap.Pixel(0, -30)
-                            });
-                            infoWindow.open(map, branch.path[Math.floor(branch.path.length / 2)]);
-                        });
-                        
-                        polyline.setMap(map);
-                        console.log('支线', index + 1, '绘制完成:', polyline);
-                    });
-                    console.log('所有支线绘制完成');
-                    
-                    // 添加节点标记
-                    console.log('开始添加节点标记...');
-                    nodes.forEach(function(node, index) {
-                        console.log('添加节点标记', index + 1, node.name);
-                        var marker = new AMap.Marker({
-                            position: [node.lng, node.lat],
-                            title: node.name,
-                            icon: new AMap.Icon({
-                                size: new AMap.Size(30, 30),
-                                image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
-                                imageSize: new AMap.Size(30, 30)
-                            })
-                        });
-                        
-                        // 信息窗口
-                        var infoWindow = new AMap.InfoWindow({
-                            content: '<h3>' + node.name + '</h3><p>' + node.desc + '</p>',
-                            offset: new AMap.Pixel(0, -30)
-                        });
-                        
-                        // 点击标记打开信息窗口
-                        marker.on('click', function() {
-                            infoWindow.open(map, marker.getPosition());
-                        });
-                        
-                        marker.setMap(map);
-                        console.log('节点标记', index + 1, '添加完成:', marker);
-                    });
-                    console.log('所有节点标记添加完成');
-                    
-                    // 添加控件
-                    console.log('开始添加控件...');
-                    if (typeof AMap.ToolBar !== 'undefined') {
-                        map.addControl(new AMap.ToolBar({
-                            position: 'RB'
-                        }));
-                        console.log('ToolBar控件添加完成');
-                    } else {
-                        console.warn('AMap.ToolBar不可用，跳过添加');
-                    }
-                    
-                    if (typeof AMap.Scale !== 'undefined') {
-                        map.addControl(new AMap.Scale({
-                            position: 'RB'
-                        }));
-                        console.log('Scale控件添加完成');
-                    } else {
-                        console.warn('AMap.Scale不可用，跳过添加');
-                    }
-                    console.log('所有控件添加完成');
-                    
-                    // 初始化D3.js路线可视化
-                    initD3RouteVisualization(data);
-                })
-                .catch(error => {
-                    console.error('加载路线数据失败:', error);
-                    console.error('错误详细信息:', error.message);
-                    // 显示错误信息
-                    document.getElementById('amap-container').innerHTML = 
-                        '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">数据加载失败，请检查控制台错误信息</div>';
+
+            // 添加工具条
+            map.plugin(['AMap.ToolBar', 'AMap.Scale'], function() {
+                map.addControl(new AMap.ToolBar());
+                map.addControl(new AMap.Scale());
+            });
+
+            // 添加主线
+            const mainPolyline = new AMap.Polyline({
+                path: routeData.mainRoute,
+                strokeColor: '#1890ff',
+                strokeWeight: 5,
+                strokeOpacity: 0.8
+            });
+            map.add(mainPolyline);
+
+            // 添加分支路线
+            routeData.branchRoutes.forEach(branch => {
+                const branchPolyline = new AMap.Polyline({
+                    path: branch.path,
+                    strokeColor: '#52c41a',
+                    strokeWeight: 3,
+                    strokeOpacity: 0.6,
+                    strokeDasharray: [10, 5]
                 });
+                map.add(branchPolyline);
+            });
+
+            // 添加节点标记
+            routeData.nodes.forEach(node => {
+                const marker = new AMap.Marker({
+                    position: [node.lng, node.lat],
+                    title: node.name,
+                    icon: new AMap.Icon({
+                        size: new AMap.Size(30, 30),
+                        image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+                        imageSize: new AMap.Size(30, 30)
+                    })
+                });
+                map.add(marker);
+
+                // 添加信息窗口
+                const infoWindow = new AMap.InfoWindow({
+                    content: `<h3>${node.name}</h3><p>${node.desc}</p>`,
+                    offset: new AMap.Pixel(0, -30)
+                });
+
+                marker.on('click', function() {
+                    infoWindow.open(map, marker.getPosition());
+                });
+            });
+
+            // 添加小车动画到高德地图
+            addCarAnimationToAMap(map);
+
+            return map;
         }
-        
-        // 使用D3.js初始化路线可视化
-        function initD3RouteVisualization(data) {
-            console.log('初始化D3.js路线可视化...');
-            
+
+        // 在高德地图上添加小车动画
+        function addCarAnimationToAMap(map) {
+            // 创建小车标记
+            const carMarker = new AMap.Marker({
+                position: routeData.mainRoute[0],
+                icon: new AMap.Icon({
+                    size: new AMap.Size(40, 40),
+                    image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/car.png',
+                    imageSize: new AMap.Size(40, 40)
+                }),
+                offset: new AMap.Pixel(-20, -20)
+            });
+            map.add(carMarker);
+
+            // 开始动画
+            let i = 1;
+            function moveCar() {
+                if (i < routeData.mainRoute.length) {
+                    const nextPoint = routeData.mainRoute[i];
+                    
+                    // 更新小车位置
+                    carMarker.setPosition(nextPoint);
+
+                    // 计算方向角
+                    const prevPoint = routeData.mainRoute[i - 1];
+                    const angle = Math.atan2(
+                        nextPoint[1] - prevPoint[1],
+                        nextPoint[0] - prevPoint[0]
+                    ) * 180 / Math.PI;
+                    
+                    // 更新小车旋转角度
+                    carMarker.setAngle(angle);
+
+                    i++;
+                    setTimeout(moveCar, 1000);
+                } else {
+                    // 动画结束后重新开始
+                    i = 0;
+                    setTimeout(moveCar, 1000);
+                }
+            }
+
+            moveCar();
+        }
+
+        // 初始化D3.js路线可视化
+        function initD3RouteVisualization() {
             const container = document.getElementById('d3-route-container');
             const width = container.clientWidth || 800;
             const height = container.clientHeight || 600;
             const padding = { top: 20, right: 20, bottom: 20, left: 20 };
-            
+
             // 清除现有内容
             container.innerHTML = '';
-            
+
             // 创建SVG
             const svg = d3.select(container)
                 .append('svg')
                 .attr('width', width)
                 .attr('height', height);
-            
+
             // 提取所有经纬度数据用于计算投影范围
             const allCoords = [];
-            data.mainRoute.forEach(coord => allCoords.push([coord[0], coord[1]]));
-            data.branchRoutes.forEach(branch => {
-                branch.path.forEach(coord => allCoords.push([coord[0], coord[1]]));
-            });
-            data.nodes.forEach(node => allCoords.push([node.lng, node.lat]));
-            
+            routeData.mainRoute.forEach(coord => allCoords.push([coord[0], coord[1]]));
+            routeData.nodes.forEach(node => allCoords.push([node.lng, node.lat]));
+
             // 创建地理投影
             const projection = d3.geoMercator()
                 .fitExtent([[padding.left, padding.top], [width - padding.right, height - padding.bottom]], {
@@ -463,139 +394,57 @@
                         }
                     }]
                 });
-            
-            // 创建路径生成器
-            const path = d3.geoPath().projection(projection);
-            
+
             // 创建线条生成器（用于平滑曲线）
             const line = d3.line()
                 .x(d => projection([d[0], d[1]])[0])
                 .y(d => projection([d[0], d[1]])[1])
                 .curve(d3.curveCatmullRom.alpha(0.5));
-            
+
             // 添加背景
             svg.append('rect')
                 .attr('width', width)
                 .attr('height', height)
                 .style('fill', '#f5f5f5');
-            
-            // 添加支线
-            data.branchRoutes.forEach((branch, index) => {
-                const branchPath = svg.append('path')
+
+            // 添加主线
+            const mainPath = svg.append('path')
+                .datum(routeData.mainRoute)
+                .attr('d', line)
+                .style('fill', 'none')
+                .style('stroke', '#1890ff')
+                .style('stroke-width', 5)
+                .style('stroke-opacity', 0.8);
+
+            // 添加分支路线
+            routeData.branchRoutes.forEach(branch => {
+                svg.append('path')
                     .datum(branch.path)
                     .attr('d', line)
                     .style('fill', 'none')
                     .style('stroke', '#52c41a')
                     .style('stroke-width', 3)
-                    .style('stroke-opacity', 0)
-                    .style('stroke-dasharray', '5,5');
-                
-                // 添加动态显示效果
-                const length = branchPath.node().getTotalLength();
-                branchPath
-                    .attr('stroke-dasharray', length)
-                    .attr('stroke-dashoffset', length)
-                    .transition()
-                    .duration(2000)
-                    .delay(index * 500)
                     .style('stroke-opacity', 0.6)
-                    .attr('stroke-dashoffset', 0);
-                
-                // 添加点击事件
-                branchPath.on('click', function(event) {
-                    // 创建提示框
-                    const tooltip = d3.select('body')
-                        .append('div')
-                        .attr('class', 'tooltip')
-                        .style('position', 'absolute')
-                        .style('background-color', 'rgba(0, 0, 0, 0.8)')
-                        .style('color', 'white')
-                        .style('padding', '8px 12px')
-                        .style('border-radius', '4px')
-                        .style('font-size', '12px')
-                        .style('pointer-events', 'none')
-                        .style('z-index', 9999)
-                        .style('left', (event.pageX + 10) + 'px')
-                        .style('top', (event.pageY - 28) + 'px')
-                        .text(`${branch.name}: ${branch.desc}`);
-                    
-                    // 3秒后移除提示框
-                    setTimeout(() => tooltip.remove(), 3000);
-                });
+                    .style('stroke-dasharray', '10,5');
             });
-            
-            // 添加主线
-            const mainPath = svg.append('path')
-                .datum(data.mainRoute)
-                .attr('d', line)
-                .style('fill', 'none')
-                .style('stroke', '#1890ff')
-                .style('stroke-width', 5)
-                .style('stroke-opacity', 0);
-            
-            // 添加动态显示效果
-            const mainLength = mainPath.node().getTotalLength();
-            mainPath
-                .attr('stroke-dasharray', mainLength)
-                .attr('stroke-dashoffset', mainLength)
-                .transition()
-                .duration(3000)
-                .delay(1000)
-                .style('stroke-opacity', 0.8)
-                .attr('stroke-dashoffset', 0)
-                .on('end', function() {
-                    // 路线显示完成后，添加马匹动画
-                    console.log('路线显示完成，准备开始马匹动画');
-                    // 直接调用马匹动画，不依赖数据传递
-                    animateHorse();
-                });
-            
-            // 添加主线点击事件
-            mainPath.on('click', function(event) {
-                // 创建提示框
-                const tooltip = d3.select('body')
-                    .append('div')
-                    .attr('class', 'tooltip')
-                    .style('position', 'absolute')
-                    .style('background-color', 'rgba(0, 0, 0, 0.8)')
-                    .style('color', 'white')
-                    .style('padding', '8px 12px')
-                    .style('border-radius', '4px')
-                    .style('font-size', '12px')
-                    .style('pointer-events', 'none')
-                    .style('z-index', 9999)
-                    .style('left', (event.pageX + 10) + 'px')
-                    .style('top', (event.pageY - 28) + 'px')
-                    .text('京藏古道主线: 元代北京至西藏的主要驿路，全长约4300公里');
-                
-                // 3秒后移除提示框
-                setTimeout(() => tooltip.remove(), 3000);
-            });
-            
+
             // 添加节点
             const nodes = svg.selectAll('.node')
-                .data(data.nodes)
+                .data(routeData.nodes)
                 .enter()
                 .append('circle')
                 .attr('class', 'node')
                 .attr('cx', d => projection([d.lng, d.lat])[0])
                 .attr('cy', d => projection([d.lng, d.lat])[1])
-                .attr('r', 0)
+                .attr('r', 5)
                 .style('fill', '#ff7875')
                 .style('stroke', '#fff')
                 .style('stroke-width', 2)
-                .style('opacity', 0);
-            
-            // 添加节点动态显示效果
-            nodes.transition()
-                .duration(500)
-                .delay((d, i) => 2000 + i * 100)
-                .attr('r', 5)
                 .style('opacity', 1);
-            
+
             // 添加节点标签
             const labels = svg.selectAll('.node-label')
-                .data(data.nodes)
+                .data(routeData.nodes)
                 .enter()
                 .append('text')
                 .attr('class', 'node-label')
@@ -603,197 +452,91 @@
                 .attr('y', d => projection([d.lng, d.lat])[1] + 4)
                 .style('font-size', '10px')
                 .style('fill', '#333')
-                .style('opacity', 0)
+                .style('opacity', 0.7)
                 .text(d => d.name);
-            
-            // 添加标签动态显示效果
-            labels.transition()
-                .duration(500)
-                .delay((d, i) => 2500 + i * 100)
-                .style('opacity', 0.7);
-            
-            // 添加节点悬停效果
-            nodes.on('mouseover', function(event, d) {
-                d3.select(this)
-                    .attr('r', 8)
-                    .style('fill', '#ff4d4f');
-                
-                // 创建提示框
-                const tooltip = d3.select('body')
-                    .append('div')
-                    .attr('class', 'tooltip')
-                    .style('position', 'absolute')
-                    .style('background-color', 'rgba(0, 0, 0, 0.8)')
-                    .style('color', 'white')
-                    .style('padding', '8px 12px')
-                    .style('border-radius', '4px')
-                    .style('font-size', '12px')
-                    .style('pointer-events', 'none')
-                    .style('z-index', 9999)
-                    .style('left', (event.pageX + 10) + 'px')
-                    .style('top', (event.pageY - 28) + 'px')
-                    .html(`<strong>${d.name}</strong><br>${d.desc}`);
-            })
-            .on('mouseout', function() {
-                d3.select(this)
-                    .attr('r', 5)
-                    .style('fill', '#ff7875');
-                
-                // 移除提示框
-                d3.selectAll('.tooltip').remove();
+
+            // 准备路线点
+            const routePoints = routeData.mainRoute.map(coord => {
+                const [x, y] = projection([coord[0], coord[1]]);
+                return { x, y, original: coord };
             });
-            
-            // 马匹动画函数
-            function animateHorse() {
-                console.log('开始马匹动画...');
-                console.log('数据是否可用:', data);
-                console.log('主线数据长度:', data.mainRoute.length);
-                
-                // 直接使用data.mainRoute
-                const route = data.mainRoute;
-                
-                // 创建马匹图标
-                const horse = svg.append('g')
-                    .attr('class', 'horse')
-                    .style('opacity', 1); // 立即显示，不使用过渡
-                
-                // 使用非常大、非常明显的马匹图标
-                const horseGroup = horse.append('g')
-                    .attr('transform', 'scale(6)'); // 显著增大尺寸
-                
-                // 绘制一个非常明显的红色圆点作为标记
-                horseGroup.append('circle')
-                    .attr('cx', 0)
-                    .attr('cy', 0)
-                    .attr('r', 10)
-                    .style('fill', '#ff0000')
-                    .style('stroke', '#000')
-                    .style('stroke-width', 2);
-                
-                // 添加一个简单的箭头表示方向
-                horseGroup.append('path')
-                    .attr('d', 'M15,0 L25,5 L25,-5 Z')
-                    .style('fill', '#000');
-                
-                // 确保路线点数组创建正确
-                console.log('路线点数量:', route.length);
-                
-                // 直接使用路线数据点，不使用路径长度计算
-                const routePoints = route.map(coord => {
-                    const [x, y] = projection([coord[0], coord[1]]);
-                    return { x, y };
-                });
-                
-                console.log('动画点数量:', routePoints.length);
-                console.log('第一个点坐标:', routePoints[0]);
-                
-                // 添加一个明显的标记，显示初始位置
-                svg.append('circle')
-                    .attr('cx', routePoints[0].x)
-                    .attr('cy', routePoints[0].y)
-                    .attr('r', 8)
-                    .style('fill', '#ffff00')
-                    .style('stroke', '#000')
-                    .style('stroke-width', 2)
-                    .style('opacity', 0.7);
-                
-                // 设置初始位置
-                const firstPoint = routePoints[0];
-                horse.attr('transform', `translate(${firstPoint.x}, ${firstPoint.y}) rotate(0)`);
-                console.log('马匹初始位置设置完成，实际位置:', firstPoint.x, firstPoint.y);
-                
-                // 立即开始动画，不等待过渡结束
-                let i = 0;
-                function moveHorse() {
-                    if (i < routePoints.length) {
-                        const point = routePoints[i];
-                        console.log('移动到点:', i, point);
-                        
-                        // 计算方向
-                        let angle = 0;
-                        if (i > 0) {
-                            const prevPoint = routePoints[i - 1];
-                            angle = Math.atan2(point.y - prevPoint.y, point.x - prevPoint.x) * 180 / Math.PI;
-                        }
-                        
-                        // 直接更新马匹位置和方向，不使用transition
-                        horse.attr('transform', `translate(${point.x}, ${point.y}) rotate(${angle})`);
-                        console.log('马匹移动到位置:', point.x, point.y, '角度:', angle);
-                        
-                        // 添加临时标记点，显示马匹经过的位置
-                        svg.append('circle')
-                            .attr('cx', point.x)
-                            .attr('cy', point.y)
-                            .attr('r', 4)
-                            .style('fill', '#00ff00')
-                            .style('stroke', '#000')
-                            .style('stroke-width', 1)
-                            .style('opacity', 0.5);
-                        
-                        i++;
-                        // 减慢动画速度
-                        setTimeout(moveHorse, 1500); // 进一步减慢，确保我们能看到
-                    } else {
-                        // 动画结束，隐藏马匹
-                        horse.style('opacity', 0);
-                        console.log('马匹动画结束');
-                    }
+
+            // 创建小车元素
+            const car = svg.append('g')
+                .attr('class', 'car')
+                .attr('transform', `translate(${routePoints[0].x}, ${routePoints[0].y})`);
+
+            // 添加小车车身
+            car.append('rect')
+                .attr('width', 20)
+                .attr('height', 10)
+                .attr('x', -10)
+                .attr('y', -5)
+                .style('fill', '#ff0000')
+                .style('stroke', '#000')
+                .style('stroke-width', 2);
+
+            // 添加小车车轮
+            car.append('circle')
+                .attr('cx', -5)
+                .attr('cy', 5)
+                .attr('r', 3)
+                .style('fill', '#000');
+
+            car.append('circle')
+                .attr('cx', 5)
+                .attr('cy', 5)
+                .attr('r', 3)
+                .style('fill', '#000');
+
+            // 添加小车车头
+            car.append('polygon')
+                .attr('points', '10,-5 15,0 10,5')
+                .style('fill', '#ff0000')
+                .style('stroke', '#000')
+                .style('stroke-width', 2);
+
+            // 小车动画函数
+            let i = 1;
+            function moveCar() {
+                if (i < routePoints.length) {
+                    const currentPoint = routePoints[i - 1];
+                    const nextPoint = routePoints[i];
+
+                    // 计算方向角
+                    const dx = nextPoint.x - currentPoint.x;
+                    const dy = nextPoint.y - currentPoint.y;
+                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+                    // 更新小车位置和旋转角度
+                    car.transition()
+                        .duration(500)
+                        .attr('transform', `translate(${nextPoint.x}, ${nextPoint.y}) rotate(${angle})`);
+
+                    i++;
+                    setTimeout(moveCar, 1000);
+                } else {
+                    // 动画结束后重新开始
+                    i = 0;
+                    setTimeout(moveCar, 1000);
                 }
-                
-                // 立即开始动画
-                console.log('准备开始移动动画');
-                moveHorse();
             }
-            
-            // 获取路径上的点
-            function getPointAtLength(pathString, progress) {
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.setAttribute('d', pathString);
-                const length = path.getTotalLength();
-                const point = path.getPointAtLength(length * progress);
-                return point;
-            }
-            
-            // 添加响应式调整
-            window.addEventListener('resize', function() {
-                const newWidth = container.clientWidth || 800;
-                const newHeight = container.clientHeight || 600;
-                
-                svg.attr('width', newWidth).attr('height', newHeight);
-                
-                // 重新计算投影
-                projection.fitExtent([[padding.left, padding.top], [newWidth - padding.right, newHeight - padding.bottom]], {
-                    type: 'FeatureCollection',
-                    features: [{
-                        type: 'Feature',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: allCoords
-                        }
-                    }]
-                });
-                
-                // 更新所有元素位置
-                svg.selectAll('path').attr('d', function(d) {
-                    // 只处理有数据绑定的路径元素
-                    if (d && d[0] && d[0][0]) {
-                        return line(d);
-                    }
-                    // 对于没有数据绑定的路径（如马匹图标），保持原样
-                    return null;
-                });
-                
-                svg.selectAll('.node')
-                    .attr('cx', d => projection([d.lng, d.lat])[0])
-                    .attr('cy', d => projection([d.lng, d.lat])[1]);
-                
-                svg.selectAll('.node-label')
-                    .attr('x', d => projection([d.lng, d.lat])[0] + 10)
-                    .attr('y', d => projection([d.lng, d.lat])[1] + 4);
-            });
-            
-            console.log('D3.js路线可视化初始化完成');
+
+            // 开始动画
+            moveCar();
         }
+
+        // 页面加载完成后初始化
+        window.onload = async function() {
+            // 先加载路线数据
+            await loadRouteData();
+            
+            // 初始化高德地图
+            const map = initAMap();
+            
+            // 初始化D3.js路线可视化
+            initD3RouteVisualization();
+        };
     </script>
 </body>
 </html>
