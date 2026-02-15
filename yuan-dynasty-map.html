@@ -8,8 +8,8 @@
     <!-- 引入外部CSS文件 -->
     <link rel="stylesheet" href="css/style.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- 引入ECharts库 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <!-- 引入D3.js库 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         /* 自定义样式 */
         .top-bar {
@@ -152,7 +152,6 @@
         var yuanMap;
         var yuanHistoricalLayer;
         var jingzangRouteLayer;
-        var yuanChart;
         
         // 初始化地图
         function initMaps() {
@@ -455,52 +454,190 @@
             });
             
             // 过滤掉数量为0的省份
-            var filteredStats = {};
+            var filteredStats = [];
             for (var province in provinceStats) {
                 if (provinceStats[province] > 0) {
-                    filteredStats[province] = provinceStats[province];
+                    filteredStats.push({
+                        province: province,
+                        count: provinceStats[province]
+                    });
                 }
             }
             
-            // 更新图表
-            if (yuanChart) {
-                var provinces = Object.keys(filteredStats);
-                var stationCounts = Object.values(filteredStats);
+            // 使用D3.js更新图表
+            createD3Chart(filteredStats);
+            
+            console.log('图表数据更新完成，过滤后的省份:', filteredStats.map(d => d.province));
+            console.log('各省份节点数量:', filteredStats);
+        }
+        
+        // 使用D3.js创建图表
+        function createD3Chart(data) {
+            const container = document.getElementById('yuan-chart');
+            
+            // 清除现有内容
+            container.innerHTML = '';
+            
+            // 设置尺寸
+            const width = container.clientWidth || 800;
+            const height = container.clientHeight || 300;
+            const padding = { top: 40, right: 40, bottom: 60, left: 60 };
+            
+            // 创建SVG
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // 添加标题
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', padding.top / 2)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '16px')
+                .style('font-weight', 'bold')
+                .style('fill', '#8B4513')
+                .text('京藏古道驿站分布');
+            
+            // 创建X比例尺
+            const xScale = d3.scaleBand()
+                .domain(data.map(d => d.province))
+                .range([padding.left, width - padding.right])
+                .padding(0.2);
+            
+            // 创建Y比例尺
+            const maxCount = d3.max(data, d => d.count);
+            const yScale = d3.scaleLinear()
+                .domain([0, maxCount * 1.1])
+                .range([height - padding.bottom, padding.top]);
+            
+            // 创建X轴
+            const xAxis = d3.axisBottom(xScale);
+            
+            // 创建Y轴
+            const yAxis = d3.axisLeft(yScale)
+                .tickFormat(d => d);
+            
+            // 添加X轴
+            svg.append('g')
+                .attr('class', 'x-axis')
+                .attr('transform', `translate(0, ${height - padding.bottom})`)
+                .call(xAxis)
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .attr('text-anchor', 'end')
+                .style('font-size', '12px');
+            
+            // 添加Y轴
+            svg.append('g')
+                .attr('class', 'y-axis')
+                .attr('transform', `translate(${padding.left}, 0)`)
+                .call(yAxis);
+            
+            // 添加Y轴标签
+            svg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('x', -height / 2)
+                .attr('y', padding.left / 3)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '12px')
+                .text('驿站数量');
+            
+            // 创建过渡效果
+            const transition = d3.transition()
+                .duration(750)
+                .ease(d3.easeQuadOut);
+            
+            // 添加柱状图
+            const bars = svg.selectAll('.bar')
+                .data(data)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar')
+                .attr('x', d => xScale(d.province))
+                .attr('y', height - padding.bottom)
+                .attr('width', xScale.bandwidth())
+                .attr('height', 0)
+                .style('fill', '#8B4513')
+                .style('opacity', 0.7)
+                .transition(transition)
+                .attr('y', d => yScale(d.count))
+                .attr('height', d => height - padding.bottom - yScale(d.count));
+            
+            // 添加数据标签
+            svg.selectAll('.data-label')
+                .data(data)
+                .enter()
+                .append('text')
+                .attr('class', 'data-label')
+                .attr('x', d => xScale(d.province) + xScale.bandwidth() / 2)
+                .attr('y', d => yScale(d.count) - 10)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '12px')
+                .style('fill', '#333')
+                .text(d => d.count);
+            
+            // 添加折线图
+            const line = d3.line()
+                .x(d => xScale(d.province) + xScale.bandwidth() / 2)
+                .y(d => yScale(d.count))
+                .curve(d3.curveMonotoneX);
+            
+            svg.append('path')
+                .datum(data)
+                .attr('fill', 'none')
+                .attr('stroke', '#8B4513')
+                .attr('stroke-width', 3)
+                .attr('d', line);
+            
+            // 添加数据点
+            svg.selectAll('.data-point')
+                .data(data)
+                .enter()
+                .append('circle')
+                .attr('class', 'data-point')
+                .attr('cx', d => xScale(d.province) + xScale.bandwidth() / 2)
+                .attr('cy', d => yScale(d.count))
+                .attr('r', 5)
+                .style('fill', '#8B4513')
+                .style('stroke', '#fff')
+                .style('stroke-width', 2);
+            
+            // 添加悬停效果
+            bars.on('mouseover', function(event, d) {
+                d3.select(this)
+                    .style('opacity', 1)
+                    .style('fill', '#CD853F');
                 
-                yuanChart.setOption({
-                    xAxis: {
-                        data: provinces
-                    },
-                    series: [
-                        {
-                            data: stationCounts,
-                            type: 'bar',
-                            itemStyle: {
-                                color: '#8B4513'
-                            }
-                        },
-                        {
-                            data: stationCounts,
-                            type: 'line',
-                            smooth: true,
-                            lineStyle: {
-                                color: '#8B4513',
-                                width: 3
-                            },
-                            symbol: 'circle',
-                            symbolSize: 8,
-                            itemStyle: {
-                                color: '#8B4513',
-                                borderColor: '#fff',
-                                borderWidth: 2
-                            }
-                        }
-                    ]
-                });
+                // 创建提示框
+                const tooltip = d3.select('body')
+                    .append('div')
+                    .attr('class', 'tooltip')
+                    .style('position', 'absolute')
+                    .style('background-color', 'rgba(0, 0, 0, 0.8)')
+                    .style('color', 'white')
+                    .style('padding', '8px 12px')
+                    .style('border-radius', '4px')
+                    .style('font-size', '12px')
+                    .style('pointer-events', 'none')
+                    .style('z-index', 9999)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px')
+                    .text(`${d.province}: ${d.count}个驿站`);
+            })
+            .on('mouseout', function() {
+                d3.select(this)
+                    .style('opacity', 0.7)
+                    .style('fill', '#8B4513');
                 
-                console.log('图表数据更新完成，过滤后的省份:', provinces);
-                console.log('各省份节点数量:', filteredStats);
-            }
+                // 移除提示框
+                d3.selectAll('.tooltip').remove();
+            });
+            
+            // 添加响应式调整
+            window.addEventListener('resize', function() {
+                createD3Chart(data);
+            });
         }
 
         // 检查瓦片服务器可访问性
@@ -532,79 +669,7 @@
                 });
         }
 
-        // 初始化图表
-        function initCharts() {
-            console.log('初始化图表...');
-            try {
-                // 初始化元朝地图相关图表
-                yuanChart = echarts.init(document.getElementById('yuan-chart'));
-                
-                // 设置图表配置
-                var option = {
-                    title: {
-                        text: '京藏古道驿站分布',
-                        left: 'center'
-                    },
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'shadow'
-                        }
-                    },
-                    grid: {
-                        left: '3%',
-                        right: '4%',
-                        bottom: '3%',
-                        containLabel: true
-                    },
-                    xAxis: {
-                        type: 'category',
-                        data: ['北京', '河北', '山西', '内蒙古', '宁夏', '甘肃', '青海', '西藏']
-                    },
-                    yAxis: {
-                        type: 'value',
-                        name: '驿站数量'
-                    },
-                    series: [
-                        {
-                            data: [15, 12, 18, 25, 10, 20, 15, 8],
-                            type: 'bar',
-                            itemStyle: {
-                                color: '#8B4513'
-                            }
-                        },
-                        {
-                            data: [15, 12, 18, 25, 10, 20, 15, 8],
-                            type: 'line',
-                            smooth: true,
-                            lineStyle: {
-                                color: '#8B4513',
-                                width: 3
-                            },
-                            symbol: 'circle',
-                            symbolSize: 8,
-                            itemStyle: {
-                                color: '#8B4513',
-                                borderColor: '#fff',
-                                borderWidth: 2
-                            }
-                        }
-                    ]
-                };
-                
-                yuanChart.setOption(option);
-                
-                // 添加响应式调整
-                window.addEventListener('resize', function() {
-                    if (yuanChart) yuanChart.resize();
-                });
-                
-                console.log('图表初始化完成');
-            } catch (error) {
-                console.error('图表初始化异常:', error);
-                showGlobalError('图表初始化失败: ' + error.message);
-            }
-        }
+
 
         // 页面加载完成后初始化
         window.onload = function() {
@@ -619,8 +684,6 @@
             try {
                 console.log('初始化地图...');
                 initMaps();
-                console.log('初始化图表...');
-                initCharts();
                 
                 // 添加顶部栏按钮事件监听
                 document.getElementById('back-button').addEventListener('click', function() {

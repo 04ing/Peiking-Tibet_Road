@@ -275,6 +275,7 @@
     </div>
 
    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
         // 自定义模态框实现
         function showRelicsModal(dynasty, relics) {
@@ -308,33 +309,24 @@
         }
 
         // 加载朝代文物数据
-        // 全局朝代映射关系
-const dynastyMap = {
-    '夏': '夏朝', '商': '商朝', '周': '周朝', '秦': '秦朝',
-    '汉': '汉朝', '三国': '三国时期', '晋': '晋朝', '南北朝': '南北朝',
-    '隋': '隋朝', '唐': '唐朝', '宋': '宋朝', '元': '元朝',
-    '明': '明朝', '清': '清朝'
-};
+        const dynastyMap = {
+            '夏': '夏朝', '商': '商朝', '周': '周朝', '秦': '秦朝',
+            '汉': '汉朝', '三国': '三国时期', '晋': '晋朝', '南北朝': '南北朝',
+            '隋': '隋朝', '唐': '唐朝', '宋': '宋朝', '元': '元朝',
+            '明': '明朝', '清': '清朝'
+        };
 
-async function loadDynastyRelics(dynasty) {
-    const relics = await (await fetch('./json/cultural-relics.json')).json();
-    return relics.filter(relic => {
-        const rawDynasty = relic.era || '未知';
-        return dynastyMap[rawDynasty] === dynasty;
-    });
-}
+        async function loadDynastyRelics(dynasty) {
+            const relics = await (await fetch('./json/cultural-relics.json')).json();
+            return relics.filter(relic => {
+                const rawDynasty = relic.era || '未知';
+                return dynastyMap[rawDynasty] === dynasty;
+            });
+        }
 
-async function loadDynastyData() {
+        async function loadDynastyData() {
             const relics = await (await fetch('./json/cultural-relics.json')).json();
             
-            // 朝代标准化处理
-            const dynastyMap = {
-                '夏': '夏朝', '商': '商朝', '周': '周朝', '秦': '秦朝',
-                '汉': '汉朝', '三国': '三国时期', '晋': '晋朝', '南北朝': '南北朝',
-                '隋': '隋朝', '唐': '唐朝', '宋': '宋朝', '元': '元朝',
-                '明': '明朝', '清': '清朝'
-            };
-
             // 朝代时间范围数据
             const dynastyPeriods = {
                 '夏朝': [-2070, -1600],
@@ -363,58 +355,134 @@ async function loadDynastyData() {
                 return acc;
             }, {});
 
-            // 生成时间轴条目
+            // 生成时间轴数据
             return Object.entries(dynastyPeriods).map(([dynasty, [start, end]]) => ({
-                id: dynasty,
-                content: `<div class="time-marker">
-                    <h5>${dynasty}</h5>
-                    <p>古墓葬数量: ${dynastyCounts[dynasty] || 0}件</p>
-                </div>`,
-                start: new Date(start, 0, 1),
-                end: new Date(end, 0, 1),
-                type: 'range'
+                dynasty: dynasty,
+                start: start,
+                end: end,
+                count: dynastyCounts[dynasty] || 0
             }));
         }
 
-        loadDynastyData().then(items => {
+        // 使用D3.js创建时间轴
+        loadDynastyData().then(data => {
             const container = document.getElementById('timeline');
             
-            // 创建时间轴容器
-            const timelineContainer = document.createElement('div');
-            timelineContainer.className = 'custom-timeline';
+            // 清除现有内容
+            container.innerHTML = '';
             
-            // 创建事件容器
-            const eventsContainer = document.createElement('div');
-            eventsContainer.className = 'timeline-events';
-            timelineContainer.appendChild(eventsContainer);
+            // 设置尺寸
+            const width = container.clientWidth || 800;
+            const height = 200;
+            const padding = { top: 20, right: 40, bottom: 60, left: 40 };
             
-            // 添加朝代事件
-            items.forEach(item => {
-                const eventElement = document.createElement('div');
-                eventElement.className = 'timeline-event';
-                
-                // 添加日期标签
-                const dateElement = document.createElement('div');
-                dateElement.className = 'event-date';
-                dateElement.innerHTML = `${item.id}<br><span style="font-size: 10px; font-weight: normal;">${item.content.match(/古墓葬数量: (\d+)件/) ? item.content.match(/古墓葬数量: (\d+)件/)[1] : 0}件</span>`;
-                eventElement.appendChild(dateElement);
-                
-                // 添加事件点
-                const pointElement = document.createElement('div');
-                pointElement.className = 'event-point';
-                eventElement.appendChild(pointElement);
-                
-                eventsContainer.appendChild(eventElement);
-                
-                // 添加点击事件
-                pointElement.addEventListener('click', async function() {
-                    const dynasty = item.id;
-                    const relics = await loadDynastyRelics(dynasty);
-                    showRelicsModal(dynasty, relics);
+            // 创建SVG
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // 计算时间范围
+            const timeExtent = d3.extent(data, d => d.start).concat(d3.extent(data, d => d.end));
+            const minTime = Math.min(...timeExtent);
+            const maxTime = Math.max(...timeExtent);
+            
+            // 创建时间比例尺
+            const xScale = d3.scaleLinear()
+                .domain([minTime, maxTime])
+                .range([padding.left, width - padding.right]);
+            
+            // 创建Y比例尺（用于条形图）
+            const maxCount = d3.max(data, d => d.count);
+            const yScale = d3.scaleLinear()
+                .domain([0, maxCount])
+                .range([height - padding.bottom, padding.top]);
+            
+            // 创建X轴
+            const xAxis = d3.axisBottom(xScale)
+                .tickFormat(d => d + '年')
+                .ticks(10);
+            
+            // 添加X轴
+            svg.append('g')
+                .attr('class', 'x-axis')
+                .attr('transform', `translate(0, ${height - padding.bottom})`)
+                .call(xAxis)
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end')
+                .style('font-size', '10px');
+            
+            // 添加时间轴线条
+            svg.append('line')
+                .attr('class', 'timeline-line')
+                .attr('x1', padding.left)
+                .attr('y1', height - padding.bottom + 5)
+                .attr('x2', width - padding.right)
+                .attr('y2', height - padding.bottom + 5)
+                .style('stroke', '#8B4513')
+                .style('stroke-width', 2);
+            
+            // 添加朝代区块
+            const dynastyGroups = svg.selectAll('.dynasty-group')
+                .data(data)
+                .enter()
+                .append('g')
+                .attr('class', 'dynasty-group')
+                .style('cursor', 'pointer')
+                .on('click', async function(event, d) {
+                    const relics = await loadDynastyRelics(d.dynasty);
+                    showRelicsModal(d.dynasty, relics);
                 });
-            });
             
-            container.appendChild(timelineContainer);
+            // 添加朝代时间范围矩形
+            dynastyGroups.append('rect')
+                .attr('x', d => xScale(d.start))
+                .attr('y', height - padding.bottom - 10)
+                .attr('width', d => xScale(d.end) - xScale(d.start))
+                .attr('height', 15)
+                .style('fill', '#D2B48C')
+                .style('opacity', 0.7)
+                .style('stroke', '#8B4513')
+                .style('stroke-width', 1);
+            
+            // 添加朝代名称
+            dynastyGroups.append('text')
+                .attr('x', d => (xScale(d.start) + xScale(d.end)) / 2)
+                .attr('y', height - padding.bottom - 15)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '12px')
+                .style('font-weight', 'bold')
+                .text(d => d.dynasty);
+            
+            // 添加文物数量标签
+            dynastyGroups.append('text')
+                .attr('x', d => (xScale(d.start) + xScale(d.end)) / 2)
+                .attr('y', height - padding.bottom + 10)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '10px')
+                .text(d => d.count + '件');
+            
+            // 添加文物数量条形图
+            dynastyGroups.append('rect')
+                .attr('x', d => xScale(d.start))
+                .attr('y', d => yScale(d.count))
+                .attr('width', d => Math.max(2, xScale(d.end) - xScale(d.start)))
+                .attr('height', d => height - padding.bottom - yScale(d.count))
+                .style('fill', '#8B4513')
+                .style('opacity', 0.6);
+            
+            // 添加悬停效果
+            dynastyGroups.on('mouseover', function(event, d) {
+                d3.select(this)
+                    .selectAll('rect')
+                    .style('opacity', 1);
+            })
+            .on('mouseout', function(event, d) {
+                d3.select(this)
+                    .selectAll('rect')
+                    .style('opacity', d => d3.select(this).select('rect').attr('class') === 'count-bar' ? 0.6 : 0.7);
+            });
         }).catch(error => {
             console.error('时间轴数据加载失败:', error);
             alert('数据加载失败，请检查网络连接');

@@ -74,6 +74,7 @@
         </div>
     </section>
 
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
         // 历史事件数据
         const eventsData = [
@@ -82,6 +83,7 @@
                 title: '成吉思汗建立蒙古汗国',
                 description: '铁木真统一蒙古各部，建立蒙古汗国，为后来的京藏古道建设奠定了政治基础。',
                 date: '1206年',
+                year: 1206,
                 isKeyEvent: false
             },
             {
@@ -89,6 +91,7 @@
                 title: '蒙古灭西夏，控制河西走廊',
                 description: '蒙古军队灭亡西夏，控制了河西走廊地区，为连接中原与西藏的交通奠定了基础。',
                 date: '1227年',
+                year: 1227,
                 isKeyEvent: false
             },
             {
@@ -96,6 +99,7 @@
                 title: '蒙古军入藏',
                 description: '蒙古皇子阔端派军进入西藏，与西藏地方势力建立联系。',
                 date: '1239年',
+                year: 1239,
                 isKeyEvent: false
             },
             {
@@ -104,6 +108,7 @@
                 description: '萨迦派领袖萨班与蒙古皇子阔端在凉州（今甘肃武威）举行会盟，西藏正式归属蒙古汗国管辖，京藏古道开始形成。',
                 impact: '确立了西藏与中央政权的隶属关系，开启了京藏之间的政治、经济、文化交流。',
                 date: '1247年',
+                year: 1247,
                 isKeyEvent: true
             },
             {
@@ -111,6 +116,7 @@
                 title: '忽必烈建立元朝',
                 description: '忽必烈定国号为元，建立元朝，定都大都（今北京），京藏古道的起点正式确立。',
                 date: '1271年',
+                year: 1271,
                 isKeyEvent: false
             },
             {
@@ -118,6 +124,7 @@
                 title: '元朝统一中国',
                 description: '元朝灭亡南宋，统一中国，为京藏古道的全面建设创造了条件。',
                 date: '1279年',
+                year: 1279,
                 isKeyEvent: false
             },
             {
@@ -125,6 +132,7 @@
                 title: '设置吐蕃等处宣慰司都元帅府',
                 description: '元朝在西藏地区设置吐蕃等处宣慰司都元帅府，加强对西藏的管辖，京藏古道的管理体系初步形成。',
                 date: '1280年',
+                year: 1280,
                 isKeyEvent: false
             },
             {
@@ -133,6 +141,7 @@
                 description: '元朝正式开通从大都（今北京）至西藏的驿路，设置驿站，建立了完整的驿传体系。',
                 impact: '形成了连接内地与西藏的官方通道，促进了两地之间的人员往来和物资交流。',
                 date: '1292年',
+                year: 1292,
                 isKeyEvent: true
             },
             {
@@ -141,6 +150,7 @@
                 description: '元朝修订驿路管理制度，明确驿站的职责和运行机制，提高了京藏古道的运行效率。',
                 impact: '完善了驿路管理体系，保障了京藏古道的畅通，促进了沿线地区的发展。',
                 date: '1304年',
+                year: 1304,
                 isKeyEvent: true
             },
             {
@@ -148,6 +158,7 @@
                 title: '元顺帝即位',
                 description: '元顺帝妥懽帖睦尔即位，此时京藏古道已成为连接内地与西藏的重要通道。',
                 date: '1333年',
+                year: 1333,
                 isKeyEvent: false
             },
             {
@@ -155,6 +166,7 @@
                 title: '红巾军起义爆发',
                 description: '红巾军起义爆发，元朝统治开始动摇，京藏古道的管理受到影响。',
                 date: '1351年',
+                year: 1351,
                 isKeyEvent: false
             },
             {
@@ -162,45 +174,62 @@
                 title: '明朝建立，元朝灭亡',
                 description: '朱元璋建立明朝，元朝灭亡，京藏古道的元代历史结束，进入明朝管理时期。',
                 date: '1368年',
+                year: 1368,
                 isKeyEvent: false
             }
         ];
 
-        // 初始化自定义横向时间轴
+        // 使用D3.js创建事件时间轴
         function initCustomTimeline() {
             const container = document.getElementById('event-timeline');
             
-            // 创建时间轴容器
-            const timelineContainer = document.createElement('div');
-            timelineContainer.className = 'custom-timeline';
+            // 清除现有内容
+            container.innerHTML = '';
             
-
+            // 设置尺寸
+            const width = container.clientWidth || 800;
+            const height = 150;
+            const padding = { top: 20, right: 40, bottom: 40, left: 40 };
             
-            // 创建事件容器
-            const eventsContainer = document.createElement('div');
-            eventsContainer.className = 'timeline-events';
-            timelineContainer.appendChild(eventsContainer);
+            // 创建SVG
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
             
-            // 添加事件
-            eventsData.forEach(event => {
-                const eventElement = document.createElement('div');
-                eventElement.className = 'timeline-event';
-                
-                // 添加日期标签
-                const dateElement = document.createElement('div');
-                dateElement.className = 'event-date';
-                dateElement.textContent = event.date;
-                eventElement.appendChild(dateElement);
-                
-                // 添加事件点
-                const pointElement = document.createElement('div');
-                pointElement.className = `event-point ${event.isKeyEvent ? 'key-event' : ''}`;
-                eventElement.appendChild(pointElement);
-                
-                eventsContainer.appendChild(eventElement);
-                
-                // 添加点击事件
-                pointElement.addEventListener('click', function() {
+            // 计算时间范围
+            const yearExtent = d3.extent(eventsData, d => d.year);
+            const minYear = yearExtent[0] - 10;
+            const maxYear = yearExtent[1] + 10;
+            
+            // 创建时间比例尺
+            const xScale = d3.scaleLinear()
+                .domain([minYear, maxYear])
+                .range([padding.left, width - padding.right]);
+            
+            // 创建X轴
+            const xAxis = d3.axisBottom(xScale)
+                .tickFormat(d => d + '年')
+                .ticks(8);
+            
+            // 添加时间轴线条
+            svg.append('line')
+                .attr('class', 'timeline-line')
+                .attr('x1', padding.left)
+                .attr('y1', height - padding.bottom + 5)
+                .attr('x2', width - padding.right)
+                .attr('y2', height - padding.bottom + 5)
+                .style('stroke', '#8B4513')
+                .style('stroke-width', 2);
+            
+            // 添加事件点
+            const eventGroups = svg.selectAll('.event-group')
+                .data(eventsData)
+                .enter()
+                .append('g')
+                .attr('class', 'event-group')
+                .style('cursor', 'pointer')
+                .on('click', function(event, d) {
                     // 创建自定义弹窗
                     const modal = document.createElement('div');
                     modal.className = 'custom-modal';
@@ -209,13 +238,13 @@
                         <div class="custom-modal-dialog">
                             <div class="custom-modal-content">
                                 <div class="custom-modal-header">
-                                    <h5 class="custom-modal-title">${event.title} (${event.date})</h5>
+                                    <h5 class="custom-modal-title">${d.title} (${d.date})</h5>
                                     <button type="button" class="custom-modal-close">&times;</button>
                                 </div>
                                 <div class="custom-modal-body">
                                     <div>
-                                        <p>${event.description}</p>
-                                        ${event.impact ? `<div class="event-impact"><h4>历史影响：</h4><p>${event.impact}</p></div>` : ''}
+                                        <p>${d.description}</p>
+                                        ${d.impact ? `<div class="event-impact"><h4>历史影响：</h4><p>${d.impact}</p></div>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -236,10 +265,40 @@
                         document.body.removeChild(modal);
                     });
                 });
-            });
             
-            container.appendChild(timelineContainer);
+            // 添加事件点
+            eventGroups.append('circle')
+                .attr('cx', d => xScale(d.year))
+                .attr('cy', height - padding.bottom + 5)
+                .attr('r', d => d.isKeyEvent ? 8 : 6)
+                .style('fill', d => d.isKeyEvent ? '#8B4513' : '#D2B48C')
+                .style('stroke', '#8B4513')
+                .style('stroke-width', 2);
+            
+            // 添加事件日期标签
+            eventGroups.append('text')
+                .attr('x', d => xScale(d.year))
+                .attr('y', height - padding.bottom + 30)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '12px')
+                .text(d => d.date);
+            
+            // 添加悬停效果
+            eventGroups.on('mouseover', function(event, d) {
+                d3.select(this)
+                    .select('circle')
+                    .attr('r', d.isKeyEvent ? 10 : 8)
+                    .style('opacity', 1);
+            })
+            .on('mouseout', function(event, d) {
+                d3.select(this)
+                    .select('circle')
+                    .attr('r', d.isKeyEvent ? 8 : 6)
+                    .style('opacity', 1);
+            });
         }
+        
+
 
         // 页面加载完成后初始化时间轴
         window.addEventListener('DOMContentLoaded', initCustomTimeline);
