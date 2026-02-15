@@ -374,7 +374,7 @@
         };
 
         // 3D场景初始化
-        let scene, camera, renderer, controls, animationId;
+        let scene, camera, renderer, controls, animationId, sky;
         let isRoaming = false;
         let currentWaypointIndex = 0;
         let currentPosition = { x: 0, y: 0, z: 0 };
@@ -412,24 +412,14 @@
             directionalLight.shadow.camera.far = 5000;
             scene.add(directionalLight);
 
-            // 创建天空
-            const sky = new THREE.Sky();
-            sky.scale.setScalar(10000);
+            // 创建天空盒
+            const skyGeometry = new THREE.SphereGeometry(10000, 32, 32);
+            const skyMaterial = new THREE.MeshBasicMaterial({
+                color: 0x87CEEB,
+                side: THREE.BackSide
+            });
+            const sky = new THREE.Mesh(skyGeometry, skyMaterial);
             scene.add(sky);
-
-            const skyUniforms = sky.material.uniforms;
-            skyUniforms.turbidity.value = 10;
-            skyUniforms.rayleigh.value = 2;
-            skyUniforms.mieCoefficient.value = 0.01;
-            skyUniforms.mieDirectionalG.value = 0.8;
-
-            const sunPosition = new THREE.Vector3();
-            const theta = Math.PI * (0.49 - 0.5);
-            const phi = 2 * Math.PI * (0.25 - 0.5);
-            sunPosition.x = Math.cos(phi);
-            sunPosition.y = Math.sin(phi) * Math.sin(theta);
-            sunPosition.z = Math.sin(phi) * Math.cos(theta);
-            skyUniforms.sunPosition.value.copy(sunPosition);
 
             // 创建地形
             createTerrain();
@@ -741,15 +731,20 @@
                 particles = null;
             }
             
+            // 更新天空颜色
+            if (weather === 'cloudy') {
+                scene.background = new THREE.Color(0xCCCCCC);
+                if (sky) sky.material.color.set(0xCCCCCC);
+            } else {
+                scene.background = new THREE.Color(0x87CEEB);
+                if (sky) sky.material.color.set(0x87CEEB);
+            }
+            
             // 根据天气类型创建粒子系统
             if (weather === 'rainy') {
                 createRain();
             } else if (weather === 'snowy') {
                 createSnow();
-            } else if (weather === 'cloudy') {
-                scene.background = new THREE.Color(0xCCCCCC);
-            } else { // clear
-                scene.background = new THREE.Color(0x87CEEB);
             }
         }
 
