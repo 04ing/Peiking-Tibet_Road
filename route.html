@@ -274,6 +274,15 @@
             });
             map.add(mainPolyline);
 
+            // 添加主线点击事件
+            mainPolyline.on('click', function() {
+                const infoWindow = new AMap.InfoWindow({
+                    content: `<h3>京藏古道主线</h3><p>从北京出发，经大同、兰州、西宁至拉萨，全长约3500公里，是元代连接中原与西藏的重要交通要道。</p>`,
+                    offset: new AMap.Pixel(0, -30)
+                });
+                infoWindow.open(map, routeData.mainRoute[Math.floor(routeData.mainRoute.length / 2)]);
+            });
+
             // 添加分支路线
             routeData.branchRoutes.forEach(branch => {
                 const branchPolyline = new AMap.Polyline({
@@ -284,6 +293,15 @@
                     strokeDasharray: [10, 5]
                 });
                 map.add(branchPolyline);
+
+                // 添加分支路线点击事件
+                branchPolyline.on('click', function() {
+                    const infoWindow = new AMap.InfoWindow({
+                        content: `<h3>${branch.name}</h3><p>${branch.desc}</p>`,
+                        offset: new AMap.Pixel(0, -30)
+                    });
+                    infoWindow.open(map, branch.path[Math.floor(branch.path.length / 2)]);
+                });
             });
 
             // 添加节点标记
