@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 高德地图API -->
     <script src="https://webapi.amap.com/maps?v=2.0&key=fe4e50125495ae9967861058e720c5dd&plugin=AMap.ToolBar,AMap.Scale"></script>
+    <!-- 引入D3.js库 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
     <!-- 顶部导航栏 -->
@@ -186,6 +188,15 @@
                     <p>元代称为萨斯迦，是京藏古道的终点，西藏地区的政治、宗教中心。</p>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- 路线可视化 -->
+    <section class="route-visualization">
+        <div class="container">
+            <h2>路线可视化</h2>
+            <p>基于D3.js的平滑动态路线可视化，展示京藏古道的完整路线网络：</p>
+            <div id="d3-route-container" style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 30px;"></div>
         </div>
     </section>
 
@@ -401,6 +412,9 @@
                         console.warn('AMap.Scale不可用，跳过添加');
                     }
                     console.log('所有控件添加完成');
+                    
+                    // 初始化D3.js路线可视化
+                    initD3RouteVisualization(data);
                 })
                 .catch(error => {
                     console.error('加载路线数据失败:', error);
@@ -409,6 +423,333 @@
                     document.getElementById('amap-container').innerHTML = 
                         '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">数据加载失败，请检查控制台错误信息</div>';
                 });
+        }
+        
+        // 使用D3.js初始化路线可视化
+        function initD3RouteVisualization(data) {
+            console.log('初始化D3.js路线可视化...');
+            
+            const container = document.getElementById('d3-route-container');
+            const width = container.clientWidth || 800;
+            const height = container.clientHeight || 600;
+            const padding = { top: 20, right: 20, bottom: 20, left: 20 };
+            
+            // 清除现有内容
+            container.innerHTML = '';
+            
+            // 创建SVG
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // 提取所有经纬度数据用于计算投影范围
+            const allCoords = [];
+            data.mainRoute.forEach(coord => allCoords.push([coord[0], coord[1]]));
+            data.branchRoutes.forEach(branch => {
+                branch.path.forEach(coord => allCoords.push([coord[0], coord[1]]));
+            });
+            data.nodes.forEach(node => allCoords.push([node.lng, node.lat]));
+            
+            // 创建地理投影
+            const projection = d3.geoMercator()
+                .fitExtent([[padding.left, padding.top], [width - padding.right, height - padding.bottom]], {
+                    type: 'FeatureCollection',
+                    features: [{
+                        type: 'Feature',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: allCoords
+                        }
+                    }]
+                });
+            
+            // 创建路径生成器
+            const path = d3.geoPath().projection(projection);
+            
+            // 创建线条生成器（用于平滑曲线）
+            const line = d3.line()
+                .x(d => projection([d[0], d[1]])[0])
+                .y(d => projection([d[0], d[1]])[1])
+                .curve(d3.curveCatmullRom.alpha(0.5));
+            
+            // 添加背景
+            svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .style('fill', '#f5f5f5');
+            
+            // 添加支线
+            data.branchRoutes.forEach((branch, index) => {
+                const branchPath = svg.append('path')
+                    .datum(branch.path)
+                    .attr('d', line)
+                    .style('fill', 'none')
+                    .style('stroke', '#52c41a')
+                    .style('stroke-width', 3)
+                    .style('stroke-opacity', 0)
+                    .style('stroke-dasharray', '5,5');
+                
+                // 添加动态显示效果
+                const length = branchPath.node().getTotalLength();
+                branchPath
+                    .attr('stroke-dasharray', length)
+                    .attr('stroke-dashoffset', length)
+                    .transition()
+                    .duration(2000)
+                    .delay(index * 500)
+                    .style('stroke-opacity', 0.6)
+                    .attr('stroke-dashoffset', 0);
+                
+                // 添加点击事件
+                branchPath.on('click', function(event) {
+                    // 创建提示框
+                    const tooltip = d3.select('body')
+                        .append('div')
+                        .attr('class', 'tooltip')
+                        .style('position', 'absolute')
+                        .style('background-color', 'rgba(0, 0, 0, 0.8)')
+                        .style('color', 'white')
+                        .style('padding', '8px 12px')
+                        .style('border-radius', '4px')
+                        .style('font-size', '12px')
+                        .style('pointer-events', 'none')
+                        .style('z-index', 9999)
+                        .style('left', (event.pageX + 10) + 'px')
+                        .style('top', (event.pageY - 28) + 'px')
+                        .text(`${branch.name}: ${branch.desc}`);
+                    
+                    // 3秒后移除提示框
+                    setTimeout(() => tooltip.remove(), 3000);
+                });
+            });
+            
+            // 添加主线
+            const mainPath = svg.append('path')
+                .datum(data.mainRoute)
+                .attr('d', line)
+                .style('fill', 'none')
+                .style('stroke', '#1890ff')
+                .style('stroke-width', 5)
+                .style('stroke-opacity', 0);
+            
+            // 添加动态显示效果
+            const mainLength = mainPath.node().getTotalLength();
+            mainPath
+                .attr('stroke-dasharray', mainLength)
+                .attr('stroke-dashoffset', mainLength)
+                .transition()
+                .duration(3000)
+                .delay(1000)
+                .style('stroke-opacity', 0.8)
+                .attr('stroke-dashoffset', 0)
+                .on('end', function() {
+                    // 路线显示完成后，添加马匹动画
+                    animateHorse(data.mainRoute);
+                });
+            
+            // 添加主线点击事件
+            mainPath.on('click', function(event) {
+                // 创建提示框
+                const tooltip = d3.select('body')
+                    .append('div')
+                    .attr('class', 'tooltip')
+                    .style('position', 'absolute')
+                    .style('background-color', 'rgba(0, 0, 0, 0.8)')
+                    .style('color', 'white')
+                    .style('padding', '8px 12px')
+                    .style('border-radius', '4px')
+                    .style('font-size', '12px')
+                    .style('pointer-events', 'none')
+                    .style('z-index', 9999)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px')
+                    .text('京藏古道主线: 元代北京至西藏的主要驿路，全长约4300公里');
+                
+                // 3秒后移除提示框
+                setTimeout(() => tooltip.remove(), 3000);
+            });
+            
+            // 添加节点
+            const nodes = svg.selectAll('.node')
+                .data(data.nodes)
+                .enter()
+                .append('circle')
+                .attr('class', 'node')
+                .attr('cx', d => projection([d.lng, d.lat])[0])
+                .attr('cy', d => projection([d.lng, d.lat])[1])
+                .attr('r', 0)
+                .style('fill', '#ff7875')
+                .style('stroke', '#fff')
+                .style('stroke-width', 2)
+                .style('opacity', 0);
+            
+            // 添加节点动态显示效果
+            nodes.transition()
+                .duration(500)
+                .delay((d, i) => 2000 + i * 100)
+                .attr('r', 5)
+                .style('opacity', 1);
+            
+            // 添加节点标签
+            const labels = svg.selectAll('.node-label')
+                .data(data.nodes)
+                .enter()
+                .append('text')
+                .attr('class', 'node-label')
+                .attr('x', d => projection([d.lng, d.lat])[0] + 10)
+                .attr('y', d => projection([d.lng, d.lat])[1] + 4)
+                .style('font-size', '10px')
+                .style('fill', '#333')
+                .style('opacity', 0)
+                .text(d => d.name);
+            
+            // 添加标签动态显示效果
+            labels.transition()
+                .duration(500)
+                .delay((d, i) => 2500 + i * 100)
+                .style('opacity', 0.7);
+            
+            // 添加节点悬停效果
+            nodes.on('mouseover', function(event, d) {
+                d3.select(this)
+                    .attr('r', 8)
+                    .style('fill', '#ff4d4f');
+                
+                // 创建提示框
+                const tooltip = d3.select('body')
+                    .append('div')
+                    .attr('class', 'tooltip')
+                    .style('position', 'absolute')
+                    .style('background-color', 'rgba(0, 0, 0, 0.8)')
+                    .style('color', 'white')
+                    .style('padding', '8px 12px')
+                    .style('border-radius', '4px')
+                    .style('font-size', '12px')
+                    .style('pointer-events', 'none')
+                    .style('z-index', 9999)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px')
+                    .html(`<strong>${d.name}</strong><br>${d.desc}`);
+            })
+            .on('mouseout', function() {
+                d3.select(this)
+                    .attr('r', 5)
+                    .style('fill', '#ff7875');
+                
+                // 移除提示框
+                d3.selectAll('.tooltip').remove();
+            });
+            
+            // 马匹动画函数
+            function animateHorse(route) {
+                console.log('开始马匹动画...');
+                
+                // 创建马匹图标
+                const horse = svg.append('g')
+                    .attr('class', 'horse')
+                    .style('opacity', 0);
+                
+                // 使用路径作为马匹图标（简单的SVG路径）
+                horse.append('path')
+                    .attr('d', 'M10,0 L15,5 L10,10 L5,5 Z M10,5 L15,15 L10,20 L5,15 Z')
+                    .style('fill', '#8B4513')
+                    .style('stroke', '#000')
+                    .style('stroke-width', 1);
+                
+                // 创建路线点数组（用于动画）
+                const routePoints = [];
+                for (let i = 0; i <= 100; i++) {
+                    const progress = i / 100;
+                    const point = getPointAtLength(line(route), progress);
+                    routePoints.push(point);
+                }
+                
+                // 显示马匹
+                horse.transition()
+                    .duration(500)
+                    .style('opacity', 1)
+                    .on('end', function() {
+                        // 开始动画
+                        let i = 0;
+                        function moveHorse() {
+                            if (i < routePoints.length) {
+                                const point = routePoints[i];
+                                
+                                // 计算方向
+                                let angle = 0;
+                                if (i > 0) {
+                                    const prevPoint = routePoints[i - 1];
+                                    angle = Math.atan2(point.y - prevPoint.y, point.x - prevPoint.x) * 180 / Math.PI;
+                                }
+                                
+                                // 更新马匹位置和方向
+                                horse.transition()
+                                    .duration(50)
+                                    .attr('transform', `translate(${point.x}, ${point.y}) rotate(${angle}) scale(1.5)`);
+                                
+                                i++;
+                                requestAnimationFrame(moveHorse);
+                            } else {
+                                // 动画结束，隐藏马匹
+                                horse.transition()
+                                    .duration(500)
+                                    .style('opacity', 0);
+                            }
+                        }
+                        
+                        moveHorse();
+                    });
+            }
+            
+            // 获取路径上的点
+            function getPointAtLength(pathString, progress) {
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathString);
+                const length = path.getTotalLength();
+                const point = path.getPointAtLength(length * progress);
+                return point;
+            }
+            
+            // 添加响应式调整
+            window.addEventListener('resize', function() {
+                const newWidth = container.clientWidth || 800;
+                const newHeight = container.clientHeight || 600;
+                
+                svg.attr('width', newWidth).attr('height', newHeight);
+                
+                // 重新计算投影
+                projection.fitExtent([[padding.left, padding.top], [newWidth - padding.right, newHeight - padding.bottom]], {
+                    type: 'FeatureCollection',
+                    features: [{
+                        type: 'Feature',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: allCoords
+                        }
+                    }]
+                });
+                
+                // 更新所有元素位置
+                svg.selectAll('path').attr('d', function(d) {
+                    // 只处理有数据绑定的路径元素
+                    if (d && d[0] && d[0][0]) {
+                        return line(d);
+                    }
+                    // 对于没有数据绑定的路径（如马匹图标），保持原样
+                    return null;
+                });
+                
+                svg.selectAll('.node')
+                    .attr('cx', d => projection([d.lng, d.lat])[0])
+                    .attr('cy', d => projection([d.lng, d.lat])[1]);
+                
+                svg.selectAll('.node-label')
+                    .attr('x', d => projection([d.lng, d.lat])[0] + 10)
+                    .attr('y', d => projection([d.lng, d.lat])[1] + 4);
+            });
+            
+            console.log('D3.js路线可视化初始化完成');
         }
     </script>
 </body>
