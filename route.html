@@ -73,6 +73,26 @@
     <section class="main-routes">
         <div class="container">
             <h2>主要路线</h2>
+            <div class="route-planner" style="margin-bottom: 30px; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+                <h3>路线规划工具</h3>
+                <p>选择起点和终点，规划您的京藏古道之旅</p>
+                <div class="planner-form">
+                    <div class="form-group">
+                        <label for="start-point">起点：</label>
+                        <select id="start-point">
+                            <option value="">请选择起点</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="end-point">终点：</label>
+                        <select id="end-point">
+                            <option value="">请选择终点</option>
+                        </select>
+                    </div>
+                    <button id="plan-route-btn" class="btn-primary">规划路线</button>
+                </div>
+                <div id="route-result" style="margin-top: 20px;"></div>
+            </div>
             <div class="route-map" style="height: 600px; margin-bottom: 30px; position: relative;">
                 <div id="amap-container" style="width: 100%; height: 100%;"></div>
                 <div id="d3-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
@@ -555,12 +575,160 @@
             // 先加载路线数据
             await loadRouteData();
             
+            // 初始化下拉选项
+            initDropdownOptions();
+            
             // 初始化高德地图
             const map = initAMap();
             
             // 初始化D3.js路线可视化
             initD3RouteVisualization();
+            
+            // 添加路线规划按钮点击事件
+            document.getElementById('plan-route-btn').addEventListener('click', function() {
+                planRoute(map);
+            });
         };
+
+        // 初始化下拉选项
+        function initDropdownOptions() {
+            const startSelect = document.getElementById('start-point');
+            const endSelect = document.getElementById('end-point');
+            
+            // 清空现有选项
+            startSelect.innerHTML = '<option value="">请选择起点</option>';
+            endSelect.innerHTML = '<option value="">请选择终点</option>';
+            
+            // 添加节点选项
+            routeData.nodes.forEach(node => {
+                const startOption = document.createElement('option');
+                startOption.value = `${node.lng},${node.lat}`;
+                startOption.textContent = node.name;
+                startSelect.appendChild(startOption);
+                
+                const endOption = document.createElement('option');
+                endOption.value = `${node.lng},${node.lat}`;
+                endOption.textContent = node.name;
+                endSelect.appendChild(endOption);
+            });
+        }
+
+        // 规划路线
+        function planRoute(map) {
+            const startSelect = document.getElementById('start-point');
+            const endSelect = document.getElementById('end-point');
+            const resultDiv = document.getElementById('route-result');
+            
+            // 获取选中的起点和终点
+            const startValue = startSelect.value;
+            const endValue = endSelect.value;
+            
+            if (!startValue || !endValue) {
+                resultDiv.innerHTML = '<p style="color: red;">请选择起点和终点</p>';
+                return;
+            }
+            
+            if (startValue === endValue) {
+                resultDiv.innerHTML = '<p style="color: red;">起点和终点不能相同</p>';
+                return;
+            }
+            
+            // 解析坐标
+            const startCoords = startValue.split(',').map(Number);
+            const endCoords = endValue.split(',').map(Number);
+            
+            // 获取起点和终点名称
+            const startName = startSelect.options[startSelect.selectedIndex].text;
+            const endName = endSelect.options[endSelect.selectedIndex].text;
+            
+            // 清空旧的规划路线
+            if (window.plannedRoute) {
+                window.plannedRoute.remove();
+            }
+            
+            // 计算路线
+            // 这里使用简单的直线连接，实际项目中可以使用高德地图的路线规划API
+            const plannedPath = [startCoords, endCoords];
+            
+            // 创建规划路线
+            window.plannedRoute = new AMap.Polyline({
+                path: plannedPath,
+                strokeColor: '#ff4500',
+                strokeWeight: 6,
+                strokeOpacity: 0.8,
+                strokeDasharray: [10, 5]
+            });
+            
+            // 添加到地图
+            map.add(window.plannedRoute);
+            
+            // 调整地图视野
+            map.setFitView([window.plannedRoute]);
+            
+            // 显示路线结果
+            resultDiv.innerHTML = `
+                <h4>规划路线</h4>
+                <p><strong>起点：</strong>${startName}</p>
+                <p><strong>终点：</strong>${endName}</p>
+                <p><strong>路线长度：</strong>${calculateDistance(startCoords, endCoords).toFixed(2)} 公里</p>
+                <p><strong>路线说明：</strong>此路线为直线距离，实际旅行距离可能更长。</p>
+                <p><strong>途经站点：</strong></p>
+                <ul>
+                    ${getRouteStations(startCoords, endCoords).map(station => `<li>${station.name}</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        // 计算两点之间的距离（公里）
+        function calculateDistance(coord1, coord2) {
+            const R = 6371; // 地球半径，单位公里
+            const dLat = (coord2[1] - coord1[1]) * Math.PI / 180;
+            const dLon = (coord2[0] - coord1[0]) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(coord1[1] * Math.PI / 180) * Math.cos(coord2[1] * Math.PI / 180) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distance = R * c;
+            return distance;
+        }
+
+        // 获取路线途经站点
+        function getRouteStations(startCoords, endCoords) {
+            // 简单实现：返回起点和终点之间的站点
+            const stations = [];
+            
+            // 找到起点和终点在节点列表中的索引
+            let startIndex = -1;
+            let endIndex = -1;
+            
+            for (let i = 0; i < routeData.nodes.length; i++) {
+                const nodeCoords = [routeData.nodes[i].lng, routeData.nodes[i].lat];
+                if (nodeCoords[0] === startCoords[0] && nodeCoords[1] === startCoords[1]) {
+                    startIndex = i;
+                }
+                if (nodeCoords[0] === endCoords[0] && nodeCoords[1] === endCoords[1]) {
+                    endIndex = i;
+                }
+            }
+            
+            // 如果找到了起点和终点
+            if (startIndex !== -1 && endIndex !== -1) {
+                const start = Math.min(startIndex, endIndex);
+                const end = Math.max(startIndex, endIndex);
+                
+                for (let i = start; i <= end; i++) {
+                    stations.push(routeData.nodes[i]);
+                }
+            }
+            
+            // 如果没有找到足够的站点，返回起点和终点
+            if (stations.length === 0) {
+                stations.push({ name: document.getElementById('start-point').options[document.getElementById('start-point').selectedIndex].text });
+                stations.push({ name: document.getElementById('end-point').options[document.getElementById('end-point').selectedIndex].text });
+            }
+            
+            return stations;
+        }
     </script>
 </body>
 </html>
