@@ -6,6 +6,12 @@
 
 ## 最新更新
 
+- **2026-02-23**：优化文件结构，按功能划分目录
+  - 将除 index.html 外的所有 HTML 文件移动到 pages 文件夹
+  - 将 PDF 和 MP4 文件移动到 source 文件夹
+  - 更新所有文件路径以反映新的目录结构
+  - 修复 dataset 相关页面的 CSS 和 JS 引用路径
+  - 修复所有页面的导航栏链接和页脚链接
 - **2026-02-16**：调整路线数据中的站点坐标，确保所有站点都在对应的路线上
 - **2026-02-15**：添加路线点击显示信息功能，并为各支线上添加站点
 - **2026-02-15**：修复车辆动画循环逻辑，确保小车从起点运动到终点后正确重新开始
@@ -56,18 +62,22 @@
 
 ```
 ├── index.html              # 首页
-├── route.html              # 古道路线页面
-├── culture.html            # 文化内涵页面
-├── travel.html             # 旅游攻略页面
-├── heritage.html           # 线性文化遗产页面
-├── events.html             # 历史事件页面
-├── yuan-dynasty-map.html   # 元代地图页面
-├── artifacts_map.html      # 文物分布地图页面
-├── dataset-archaeology.html # 考古遗址数据集页面
-├── dataset-history.html    # 历史文献数据集页面
-├── dataset-images.html     # 图像数据集页面
-├── dataset-geography.html  # 地理数据集页面
-├── pdf-viewer.html         # PDF 查看器页面
+├── pages/                  # 页面文件夹
+│   ├── route.html          # 古道路线页面
+│   ├── culture.html        # 文化内涵页面
+│   ├── travel.html         # 旅游攻略页面
+│   ├── heritage.html       # 线性文化遗产页面
+│   ├── events.html         # 历史事件页面
+│   ├── yuan-dynasty-map.html # 元代地图页面
+│   ├── artifacts_map.html  # 文物分布地图页面
+│   ├── dataset-archaeology.html # 考古遗址数据集页面
+│   ├── dataset-history.html # 历史文献数据集页面
+│   ├── dataset-images.html # 图像数据集页面
+│   ├── dataset-geography.html # 地理数据集页面
+│   └── pdf-viewer.html     # PDF 查看器页面
+├── source/                 # 资源文件夹
+│   ├── *.pdf               # PDF 文件
+│   └── *.mp4               # MP4 文件
 ├── css/                    # 样式文件
 │   ├── style.css           # 主样式文件
 │   ├── travel.css          # 旅游攻略页面样式

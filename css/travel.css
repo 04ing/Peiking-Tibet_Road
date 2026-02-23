@@ -205,6 +205,145 @@
     white-space: pre-line;
 }
 
+/* 模块框框样式 */
+.module-box {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+/* 布局设置 */
+.attractions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.transportation-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.accommodation-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+/* 景点介绍、交通信息、住宿推荐的子项布局 */
+.module-box > .attraction-item,
+.module-box > .transportation-item,
+.module-box > .accommodation-item {
+    margin-bottom: 20px;
+}
+
+.module-box:hover {
+    transform: translateY(-5px);
+}
+
+.module-box h3 {
+    color: #8B4513;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+    border-bottom: 2px solid #8B4513;
+    padding-bottom: 10px;
+}
+
+.attraction-item {
+    background-color: #fff;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.attraction-item h4 {
+    color: #8B4513;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.attraction-details {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #ddd;
+}
+
+.attraction-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.transportation-item {
+    background-color: #fff;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.transportation-item h4 {
+    color: #8B4513;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.transportation-item ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.transportation-item li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.accommodation-item {
+    background-color: #fff;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.accommodation-item h4 {
+    color: #8B4513;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.hotel-list {
+    margin-top: 15px;
+}
+
+.hotel-item {
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.hotel-item h5 {
+    color: #8B4513;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.hotel-item p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
 @media (max-width: 768px) {
     .video-player {
         height: 300px;
@@ -217,6 +356,23 @@
     }
     
     .ai-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .module-box {
+        padding: 20px;
+    }
+    
+    .attraction-item,
+    .transportation-item,
+    .accommodation-item {
+        padding: 15px;
+    }
+    
+    /* 在小屏幕设备上调整为单列布局 */
+    .attractions-grid,
+    .transportation-content,
+    .accommodation-content {
         grid-template-columns: 1fr;
     }
 }

@@ -25,8 +25,8 @@
                     <li><a href="#explore">古道探索</a></li>
                     <li><a href="#map">地图展示</a></li>
                     <li><a href="#dataset">数据集</a></li>
-                    <li><a href="culture.html">文化内涵</a></li>
-                    <li><a href="travel.html">旅游攻略</a></li>
+                    <li><a href="pages/culture.html">文化内涵</a></li>
+                    <li><a href="pages/travel.html">旅游攻略</a></li>
                     <li><a href="#about">关于平台</a></li>
                 </ul>
                 <div class="search-container">
@@ -85,7 +85,7 @@
             <p>通过视频了解京藏古道的历史文化与自然风光</p>
             <div class="video-container">
                 <video class="video-player" controls>
-                    <source src="京藏古道介绍视频.mp4" type="video/mp4">
+                    <source src="source/京藏古道介绍视频.mp4" type="video/mp4">
                     您的浏览器不支持视频播放。
                 </video>
             </div>
@@ -103,7 +103,7 @@
                     </div>
                     <h3>古道路线复原与重建</h3>
                     <p>基于历史文献、考古资料和现代地理信息，对元代京藏古道的路线进行复原与重建，包括主要驿路、支线和重要节点的空间定位与可视化展示。</p>
-                    <a href="route.html" class="btn-secondary">探索路线</a>
+                    <a href="pages/route.html" class="btn-secondary">探索路线</a>
                 </div>
                 <div class="explore-item">
                     <div class="explore-icon">
@@ -111,7 +111,7 @@
                     </div>
                     <h3>历史事件脉络梳理</h3>
                     <p>梳理元代北京至西藏驿路上发生的重要历史事件，构建事件时间线，分析事件之间的关联关系，展现京藏古道在历史进程中的重要作用。</p>
-                    <a href="events.html" class="btn-secondary">查看事件</a>
+                    <a href="pages/events.html" class="btn-secondary">查看事件</a>
                 </div>
                 <div class="explore-item">
                     <div class="explore-icon">
@@ -119,7 +119,7 @@
                     </div>
                     <h3>线性文化遗产</h3>
                     <p>识别和保护京藏古道沿线的线性文化遗产，包括驿站遗址、宗教建筑、历史村落等，分析其历史价值和文化意义，促进文化遗产的传承与利用。</p>
-                    <a href="heritage.html" class="btn-secondary">了解遗产</a>
+                    <a href="pages/heritage.html" class="btn-secondary">了解遗产</a>
                 </div>
             </div>
         </div>
@@ -142,7 +142,7 @@
                         </select>
                     </div>
                     <a href="http://119.78.100.166/qzlab/Ancient-roads?type=jzgd" class="btn-secondary" target="_blank">查看重建详细地图</a>
-                    <a href="yuan-dynasty-map.html" class="btn-secondary">查看元代地图</a>
+                    <a href="pages/yuan-dynasty-map.html" class="btn-secondary">查看元代地图</a>
                 </div>
             </div>
         </div>
@@ -157,22 +157,22 @@
                 <div class="dataset-item">
                     <h3>历史文献</h3>
                     <p>包括《元史》、《经世大典》等历史文献中关于京藏古道的记载</p>
-                    <a href="dataset-history.html" class="btn-secondary">查看详情</a>
+                    <a href="pages/dataset-history.html" class="btn-secondary">查看详情</a>
                 </div>
                 <div class="dataset-item">
                     <h3>地理信息</h3>
                     <p>基于现代地理信息系统，重建元代京藏古道的地理环境</p>
-                    <a href="dataset-geography.html" class="btn-secondary">查看详情</a>
+                    <a href="pages/dataset-geography.html" class="btn-secondary">查看详情</a>
                 </div>
                 <div class="dataset-item">
                     <h3>考古资料</h3>
                     <p>整合沿线考古发现，包括驿站遗址、文物等资料</p>
-                    <a href="dataset-archaeology.html" class="btn-secondary">查看详情</a>
+                    <a href="pages/dataset-archaeology.html" class="btn-secondary">查看详情</a>
                 </div>
                 <div class="dataset-item">
                     <h3>影像资料</h3>
                     <p>包括历史照片、现代影像等可视化资料</p>
-                    <a href="dataset-images.html" class="btn-secondary">查看详情</a>
+                    <a href="pages/dataset-images.html" class="btn-secondary">查看详情</a>
                 </div>
             </div>
         </div>
@@ -225,7 +225,19 @@
                     <p>京藏古道的历史不仅存在于官方文献中，也通过民间传说、诗歌、游记等形式传承下来。这些历史叙事为我们了解古道的真实面貌提供了丰富的资料。</p>
                 </div>
             </div>
-            <a href="culture.html" class="btn-primary">探索文化内涵</a>
+            
+            <!-- 社交分享按钮 -->
+            <div class="social-share">
+                <h4>分享文化内涵</h4>
+                <div class="social-buttons">
+                    <a href="javascript:void(0)" class="social-button wechat" title="分享到微信" onclick="shareToWeChat()"><i class="fab fa-weixin"></i></a>
+                    <a href="javascript:void(0)" class="social-button qq" title="分享到QQ" onclick="shareToQQ()"><i class="fab fa-qq"></i></a>
+                    <a href="javascript:void(0)" class="social-button douyin" title="分享到抖音" onclick="shareToDouyin()"><i class="fas fa-music"></i></a>
+                    <a href="javascript:void(0)" class="social-button xiaohongshu" title="分享到小红书" onclick="shareToXiaoHongShu()"><i class="fas fa-book"></i></a>
+                </div>
+            </div>
+            
+            <a href="pages/culture.html" class="btn-primary">探索文化内涵</a>
         </div>
     </section>
 
@@ -256,7 +268,19 @@
                     <p>包括特色美食、住宿推荐、交通方式、摄影建议等实用信息，帮助您更好地规划行程。</p>
                 </div>
             </div>
-            <a href="travel.html" class="btn-primary">查看旅游攻略</a>
+            
+            <!-- 社交分享按钮 -->
+            <div class="social-share">
+                <h4>分享旅游攻略</h4>
+                <div class="social-buttons">
+                    <a href="javascript:void(0)" class="social-button wechat" title="分享到微信" onclick="shareToWeChat()"><i class="fab fa-weixin"></i></a>
+                    <a href="javascript:void(0)" class="social-button qq" title="分享到QQ" onclick="shareToQQ()"><i class="fab fa-qq"></i></a>
+                    <a href="javascript:void(0)" class="social-button douyin" title="分享到抖音" onclick="shareToDouyin()"><i class="fas fa-music"></i></a>
+                    <a href="javascript:void(0)" class="social-button xiaohongshu" title="分享到小红书" onclick="shareToXiaoHongShu()"><i class="fas fa-book"></i></a>
+                </div>
+            </div>
+            
+            <a href="pages/travel.html" class="btn-primary">查看旅游攻略</a>
         </div>
     </section>
 
@@ -296,8 +320,8 @@
                         <li><a href="#explore">古道探索</a></li>
                         <li><a href="#map">地图展示</a></li>
                         <li><a href="#dataset">数据集</a></li>
-                        <li><a href="culture.html">文化内涵</a></li>
-                        <li><a href="travel.html">旅游攻略</a></li>
+                        <li><a href="pages/culture.html">文化内涵</a></li>
+                        <li><a href="pages/travel.html">旅游攻略</a></li>
                         <li><a href="#about">关于平台</a></li>
                     </ul>
                 </div>
@@ -315,6 +339,45 @@
 
     <script src="js/main.js"></script>
     <script>
+        // 分享功能
+        function shareToWeChat() {
+            alert('分享到微信功能已触发，请使用微信扫码分享');
+            // 实际项目中，这里可以生成二维码或调用微信分享API
+            console.log('分享到微信');
+        }
+        
+        function shareToQQ() {
+            alert('分享到QQ功能已触发');
+            // 实际项目中，这里可以调用QQ分享API
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('京藏古道人文环境时空信息开放平台');
+            const summary = encodeURIComponent('探索元代北京至西藏的驿路文明');
+            window.open('https://connect.qq.com/widget/shareqq/index.html?url=' + url + '&title=' + title + '&summary=' + summary);
+            console.log('分享到QQ');
+        }
+        
+        function shareToDouyin() {
+            alert('分享到抖音功能已触发');
+            // 抖音分享需要通过抖音开放平台API实现
+            console.log('分享到抖音');
+            // 模拟抖音分享功能
+            const shareContent = '探索元代北京至西藏的驿路文明 - 京藏古道人文环境时空信息开放平台';
+            navigator.clipboard.writeText(shareContent).then(function() {
+                alert('抖音分享文案已复制到剪贴板，请打开抖音粘贴分享');
+            });
+        }
+        
+        function shareToXiaoHongShu() {
+            alert('分享到小红书功能已触发');
+            // 小红书分享需要通过小红书开放平台API实现
+            console.log('分享到小红书');
+            // 模拟小红书分享功能
+            const shareContent = '探索元代北京至西藏的驿路文明\n京藏古道人文环境时空信息开放平台\n\n跟随我们一起探索这条古老的驿路，感受历史的魅力！';
+            navigator.clipboard.writeText(shareContent).then(function() {
+                alert('小红书分享文案已复制到剪贴板，请打开小红书粘贴分享');
+            });
+        }
+        
         // 搜索功能
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search-input');
@@ -324,18 +387,18 @@
             const searchData = {
                 pages: [
                     { title: '首页', url: 'index.html', content: '京藏古道人文环境时空信息开放平台 元代北京至西藏的驿路文明' },
-                    { title: '古道路线', url: 'route.html', content: '古道路线复原与重建 元代京藏古道 北京至西藏 路线可视化' },
-                    { title: '文化内涵', url: 'culture.html', content: '京藏古道文化内涵 宗教艺术建筑 历史文化元素' },
-                    { title: '旅游攻略', url: 'travel.html', content: '京藏古道旅游攻略 旅游路线 景点推荐 自然风光' },
-                    { title: '线性文化遗产', url: 'heritage.html', content: '线性文化遗产 遗产识别与分类 价值评估 保护策略' },
-                    { title: '历史事件', url: 'events.html', content: '历史事件脉络 交互式时间轴 重要历史事件' },
-                    { title: '元代地图', url: 'yuan-dynasty-map.html', content: '元代地图 历史地图 地理信息' },
-                    { title: '文物分布地图', url: 'artifacts_map.html', content: '文物分布 文化遗产 考古遗址' },
-                    { title: '考古遗址数据集', url: 'dataset-archaeology.html', content: '考古遗址 数据 研究成果' },
-                    { title: '历史文献数据集', url: 'dataset-history.html', content: '历史文献 古籍 资料' },
-                    { title: '图像数据集', url: 'dataset-images.html', content: '图像 照片 视觉资料' },
-                    { title: '地理数据集', url: 'dataset-geography.html', content: '地理数据 地图 空间信息' },
-                    { title: 'PDF查看器', url: 'pdf-viewer.html', content: 'PDF 文档 资料' }
+                    { title: '古道路线', url: 'pages/route.html', content: '古道路线复原与重建 元代京藏古道 北京至西藏 路线可视化' },
+                    { title: '文化内涵', url: 'pages/culture.html', content: '京藏古道文化内涵 宗教艺术建筑 历史文化元素' },
+                    { title: '旅游攻略', url: 'pages/travel.html', content: '京藏古道旅游攻略 旅游路线 景点推荐 自然风光' },
+                    { title: '线性文化遗产', url: 'pages/heritage.html', content: '线性文化遗产 遗产识别与分类 价值评估 保护策略' },
+                    { title: '历史事件', url: 'pages/events.html', content: '历史事件脉络 交互式时间轴 重要历史事件' },
+                    { title: '元代地图', url: 'pages/yuan-dynasty-map.html', content: '元代地图 历史地图 地理信息' },
+                    { title: '文物分布地图', url: 'pages/artifacts_map.html', content: '文物分布 文化遗产 考古遗址' },
+                    { title: '考古遗址数据集', url: 'pages/dataset-archaeology.html', content: '考古遗址 数据 研究成果' },
+                    { title: '历史文献数据集', url: 'pages/dataset-history.html', content: '历史文献 古籍 资料' },
+                    { title: '图像数据集', url: 'pages/dataset-images.html', content: '图像 照片 视觉资料' },
+                    { title: '地理数据集', url: 'pages/dataset-geography.html', content: '地理数据 地图 空间信息' },
+                    { title: 'PDF查看器', url: 'pages/pdf-viewer.html', content: 'PDF 文档 资料' }
                 ],
                 sites: [
                     { name: '大都（今北京）', type: '节点', content: '元代首都，京藏古道起点' },
