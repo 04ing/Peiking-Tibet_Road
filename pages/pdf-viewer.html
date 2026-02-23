@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF上传与预览 - 京藏古道人文环境时空信息开放平台</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/pdf-viewer.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/pdf-viewer.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- PDF.js库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
@@ -20,13 +20,13 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="index.html">首页</a></li>
-                    <li><a href="index.html#explore">古道探索</a></li>
-                    <li><a href="index.html#map">地图展示</a></li>
-                    <li><a href="index.html#dataset">数据集</a></li>
+                    <li><a href="../index.html">首页</a></li>
+                    <li><a href="../index.html#explore">古道探索</a></li>
+                    <li><a href="../index.html#map">地图展示</a></li>
+                    <li><a href="../index.html#dataset">数据集</a></li>
                     <li><a href="culture.html">文化内涵</a></li>
                     <li><a href="travel.html">旅游攻略</a></li>
-                    <li><a href="index.html#about">关于平台</a></li>
+                    <li><a href="../index.html#about">关于平台</a></li>
                 </ul>
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="搜索...">
@@ -99,13 +99,13 @@
                 <div class="footer-links">
                     <h4>快速链接</h4>
                     <ul>
-                        <li><a href="index.html">首页</a></li>
-                        <li><a href="index.html#explore">古道探索</a></li>
-                        <li><a href="index.html#map">地图展示</a></li>
-                        <li><a href="index.html#dataset">数据集</a></li>
+                        <li><a href="../index.html">首页</a></li>
+                        <li><a href="../index.html#explore">古道探索</a></li>
+                        <li><a href="../index.html#map">地图展示</a></li>
+                        <li><a href="../index.html#dataset">数据集</a></li>
                         <li><a href="culture.html">文化内涵</a></li>
                         <li><a href="pdf-viewer.html">PDF上传预览</a></li>
-                        <li><a href="index.html#about">关于平台</a></li>
+                        <li><a href="../index.html#about">关于平台</a></li>
                     </ul>
                 </div>
                 <div class="footer-contact">
@@ -475,7 +475,7 @@
         // 加载默认PDF文件
         function loadDefaultPdf() {
             // 默认PDF文件路径
-            const defaultPdfUrl = '川藏茶马古道 (杨绍淮著, Shaohuai Yang, 楊紹淮 (中國歷史)) (z-library.sk, 1lib.sk, z-lib.sk).pdf';
+            const defaultPdfUrl = '../source/川藏茶马古道 (杨绍淮著, Shaohuai Yang, 楊紹淮 (中國歷史)) (z-library.sk, 1lib.sk, z-lib.sk).pdf';
             
             // 使用PDF.js加载默认PDF
             pdfjsLib.getDocument(defaultPdfUrl).promise.then(function(pdf) {

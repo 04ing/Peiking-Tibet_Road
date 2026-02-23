@@ -7,15 +7,14 @@
     <!-- 统一使用Leaflet 1.9.4版本 -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- 引入外部CSS文件 -->
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="../css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- 引入D3.js库 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         /* 自定义样式 */
-            flex: 1;
-        }
+
         
         .main-title {
             margin: 0;
@@ -88,13 +87,13 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="index.html">首页</a></li>
-                    <li><a href="index.html#explore">古道探索</a></li>
-                    <li><a href="index.html#map" class="active">地图展示</a></li>
-                    <li><a href="index.html#dataset">数据集</a></li>
+                    <li><a href="../index.html">首页</a></li>
+                    <li><a href="../index.html#explore">古道探索</a></li>
+                    <li><a href="../index.html#map" class="active">地图展示</a></li>
+                    <li><a href="../index.html#dataset">数据集</a></li>
                     <li><a href="culture.html">文化内涵</a></li>
                     <li><a href="travel.html">旅游攻略</a></li>
-                    <li><a href="index.html#about">关于平台</a></li>
+                    <li><a href="../index.html#about">关于平台</a></li>
                 </ul>
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="搜索...">
@@ -104,12 +103,19 @@
         </div>
     </header>
 
+    <!-- 页面标题 -->
+    <section class="page-header">
+        <div class="container">
+            <h1>元朝京藏古道地图</h1>
+            <p>基于元代北京至西藏驿路的历史地理信息可视化</p>
+        </div>
+    </section>
+
     <!-- 地图控制栏 -->
     <div class="top-bar" style="display: flex; align-items: center; justify-content: space-between; background-color: #8B4513; color: white; padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         <button class="back-button" id="back-button">返回</button>
         <div class="top-bar-title" style="flex: 1; text-align: center;">
-            <h1 class="main-title" style="margin: 0; font-size: 24px;">元朝京藏古道地图</h1>
-            <p class="subtitle" style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">基于元代北京至西藏驿路的历史地理信息可视化</p>
+            <h2 class="main-title" style="margin: 0; font-size: 20px;">地图控制</h2>
         </div>
         <button class="comparison-button" id="info-button">地图信息</button>
     </div>
@@ -335,7 +341,7 @@
             console.log('尝试加载京藏古道路线数据...');
             
             // 从JSON文件加载数据
-            fetch('json/route-data.json')
+            fetch('../json/route-data.json')
                 .then(response => response.json())
                 .then(data => {
                     console.log('路线数据加载成功:', data);
@@ -688,7 +694,7 @@
                 
                 // 添加顶部栏按钮事件监听
                 document.getElementById('back-button').addEventListener('click', function() {
-                    window.location.href = 'index.html';
+                    window.location.href = '../index.html';
                 });
                 
                 // 地图信息弹窗控制
@@ -717,5 +723,7 @@
             }
         };
     </script>
+    
+    <script src="../js/main.js"></script>
 </body>
 </html>
