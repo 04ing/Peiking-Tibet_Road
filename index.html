@@ -330,10 +330,10 @@
     <script>
         // 分享功能
         function shareToWeChat() {
-            // 创建二维码容器
-            const qrContainer = document.createElement('div');
-            qrContainer.id = 'wechat-qr-container';
-            qrContainer.style.cssText = `
+            // 创建分享容器
+            const shareContainer = document.createElement('div');
+            shareContainer.id = 'wechat-share-container';
+            shareContainer.style.cssText = `
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -346,36 +346,73 @@
                 z-index: 10000;
             `;
             
-            // 创建二维码内容
-            const qrContent = document.createElement('div');
-            qrContent.style.cssText = `
+            // 创建分享内容
+            const shareContent = document.createElement('div');
+            shareContent.style.cssText = `
                 background-color: white;
                 padding: 30px;
                 border-radius: 10px;
                 text-align: center;
                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+                max-width: 400px;
             `;
             
             // 添加标题
-            const qrTitle = document.createElement('h3');
-            qrTitle.textContent = '微信扫码分享';
-            qrTitle.style.marginBottom = '20px';
-            qrContent.appendChild(qrTitle);
+            const shareTitle = document.createElement('h3');
+            shareTitle.textContent = '微信分享';
+            shareTitle.style.marginBottom = '20px';
+            shareContent.appendChild(shareTitle);
             
-            // 添加二维码图片
-            const qrImage = document.createElement('img');
-            const currentUrl = encodeURIComponent(window.location.href);
-            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${currentUrl}`;
-            qrImage.src = qrCodeUrl;
-            qrImage.alt = '微信分享二维码';
-            qrImage.style.marginBottom = '20px';
-            qrContent.appendChild(qrImage);
+            // 添加分享链接
+            const shareLink = document.createElement('div');
+            shareLink.style.marginBottom = '20px';
             
-            // 添加提示文字
-            const qrHint = document.createElement('p');
-            qrHint.textContent = '请使用微信扫码分享本页面';
-            qrHint.style.marginBottom = '20px';
-            qrContent.appendChild(qrHint);
+            const linkLabel = document.createElement('p');
+            linkLabel.textContent = '分享链接：';
+            linkLabel.style.marginBottom = '10px';
+            shareLink.appendChild(linkLabel);
+            
+            const linkInput = document.createElement('input');
+            linkInput.type = 'text';
+            linkInput.value = 'https://04ing.github.io/Peking-Tibet_Road/';
+            linkInput.style.cssText = `
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                marginBottom: 10px;
+                font-size: 14px;
+            `;
+            linkInput.readOnly = true;
+            shareLink.appendChild(linkInput);
+            
+            const copyButton = document.createElement('button');
+            copyButton.textContent = '复制链接';
+            copyButton.style.cssText = `
+                padding: 8px 16px;
+                background-color: #8B4513;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+            `;
+            copyButton.onclick = function() {
+                linkInput.select();
+                document.execCommand('copy');
+                alert('链接已复制到剪贴板，请在微信中粘贴分享');
+            };
+            shareLink.appendChild(copyButton);
+            
+            shareContent.appendChild(shareLink);
+            
+            // 添加分享提示
+            const shareHint = document.createElement('p');
+            shareHint.textContent = '请复制以上链接，在微信中粘贴分享给好友或分享到朋友圈';
+            shareHint.style.marginBottom = '20px';
+            shareHint.style.fontSize = '14px';
+            shareHint.style.color = '#666';
+            shareContent.appendChild(shareHint);
             
             // 添加关闭按钮
             const closeButton = document.createElement('button');
@@ -390,13 +427,13 @@
                 font-size: 16px;
             `;
             closeButton.onclick = function() {
-                document.body.removeChild(qrContainer);
+                document.body.removeChild(shareContainer);
             };
-            qrContent.appendChild(closeButton);
+            shareContent.appendChild(closeButton);
             
             // 组装并添加到页面
-            qrContainer.appendChild(qrContent);
-            document.body.appendChild(qrContainer);
+            shareContainer.appendChild(shareContent);
+            document.body.appendChild(shareContainer);
             
             console.log('分享到微信');
         }
