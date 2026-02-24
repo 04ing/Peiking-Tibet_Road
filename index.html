@@ -14,30 +14,8 @@
     <script src="https://webapi.amap.com/maps?v=2.0&key=fe4e50125495ae9967861058e720c5dd"></script>
 </head>
 <body>
-    <!-- 顶部导航栏 -->
-    <header>
-        <div class="container">
-            <div class="logo">
-                <h1>京藏古道人文环境时空信息开放平台</h1>
-                <p>元代北京至西藏的驿路文明</p>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="index.html">首页</a></li>
-                    <li><a href="#explore">古道探索</a></li>
-                    <li><a href="#map">地图展示</a></li>
-                    <li><a href="#dataset">数据集</a></li>
-                    <li><a href="pages/culture.html">文化内涵</a></li>
-                    <li><a href="pages/travel.html">旅游攻略</a></li>
-                    <li><a href="#about">关于平台</a></li>
-                </ul>
-                <div class="search-container">
-                    <input type="text" id="search-input" placeholder="搜索...">
-                    <button id="search-button"><i class="fas fa-search"></i></button>
-                </div>
-            </nav>
-        </div>
-    </header>
+    <!-- 导航栏容器 -->
+    <div id="navbar-container"></div>
 
     <!-- 英雄区域 -->
     <section class="hero">
@@ -339,6 +317,7 @@
         </div>
     </footer>
 
+    <script src="js/template-loader.js"></script>
     <script src="js/main.js"></script>
     <!-- Utterances评论系统 -->
     <script src="https://utteranc.es/client.js"
