@@ -92,7 +92,7 @@
         function createMarker(relic) {
             const marker = L.marker([relic.latitude, relic.longitude], {
                 icon: L.icon({
-                    iconUrl: './img/古墓.png',
+                    iconUrl: '../img/古墓.png',
                     iconSize: [32, 32],
                     popupAnchor: [0, -15]
                 })
@@ -295,7 +295,7 @@
             modalBody.innerHTML = relics.map(relic => `
                 <div class="relic-card">
                     <h6>${relic.name || '未命名古墓葬'}</h6>
-                    ${relic.image ? `<img src="./img/${relic.image}" alt="${relic.name}">` : ''}
+                    ${relic.image ? `<img src="../img/${relic.image}" alt="${relic.name}">` : ''}
                     <p class="mt-2 text-muted">
                         <span>批次：${relic.batch || '未知'}</span><br>
                         <span>地址：${relic.address || '地址不详'}</span>
