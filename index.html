@@ -330,8 +330,74 @@
     <script>
         // 分享功能
         function shareToWeChat() {
-            alert('分享到微信功能已触发，请使用微信扫码分享');
-            // 实际项目中，这里可以生成二维码或调用微信分享API
+            // 创建二维码容器
+            const qrContainer = document.createElement('div');
+            qrContainer.id = 'wechat-qr-container';
+            qrContainer.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            // 创建二维码内容
+            const qrContent = document.createElement('div');
+            qrContent.style.cssText = `
+                background-color: white;
+                padding: 30px;
+                border-radius: 10px;
+                text-align: center;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            `;
+            
+            // 添加标题
+            const qrTitle = document.createElement('h3');
+            qrTitle.textContent = '微信扫码分享';
+            qrTitle.style.marginBottom = '20px';
+            qrContent.appendChild(qrTitle);
+            
+            // 添加二维码图片
+            const qrImage = document.createElement('img');
+            const currentUrl = encodeURIComponent(window.location.href);
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${currentUrl}`;
+            qrImage.src = qrCodeUrl;
+            qrImage.alt = '微信分享二维码';
+            qrImage.style.marginBottom = '20px';
+            qrContent.appendChild(qrImage);
+            
+            // 添加提示文字
+            const qrHint = document.createElement('p');
+            qrHint.textContent = '请使用微信扫码分享本页面';
+            qrHint.style.marginBottom = '20px';
+            qrContent.appendChild(qrHint);
+            
+            // 添加关闭按钮
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '关闭';
+            closeButton.style.cssText = `
+                padding: 10px 20px;
+                background-color: #8B4513;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            `;
+            closeButton.onclick = function() {
+                document.body.removeChild(qrContainer);
+            };
+            qrContent.appendChild(closeButton);
+            
+            // 组装并添加到页面
+            qrContainer.appendChild(qrContent);
+            document.body.appendChild(qrContainer);
+            
             console.log('分享到微信');
         }
         
