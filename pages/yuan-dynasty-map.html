@@ -27,7 +27,7 @@
             opacity: 0.9;
         }
         
-        .container {
+        .map-page-container {
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -113,14 +113,14 @@
 
     <!-- 地图控制栏 -->
     <div class="top-bar" style="display: flex; align-items: center; justify-content: space-between; background-color: #8B4513; color: white; padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <button class="back-button" id="back-button">返回</button>
+        <button class="back-button btn-secondary" id="back-button" style="background-color: #A0522D; color: white; border: none; border-radius: 5px; padding: 8px 16px; cursor: pointer; transition: background-color 0.3s ease;">返回</button>
         <div class="top-bar-title" style="flex: 1; text-align: center;">
             <h2 class="main-title" style="margin: 0; font-size: 20px;">地图控制</h2>
         </div>
-        <button class="comparison-button" id="info-button">地图信息</button>
+        <button class="comparison-button btn-secondary" id="info-button" style="background-color: #A0522D; color: white; border: none; border-radius: 5px; padding: 8px 16px; cursor: pointer; transition: background-color 0.3s ease;">地图信息</button>
     </div>
     
-    <div class="container">
+    <div class="map-page-container">
         <!-- 元朝地图 -->
         <div class="dynasty-container">
             <div class="dynasty-title">元朝京藏古道</div>
