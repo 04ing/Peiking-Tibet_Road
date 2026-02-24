@@ -73,7 +73,7 @@
         let routeLayers = [];
 
         async function loadCulturalRelics() {
-            relicsData = await (await fetch('./json/cultural-relics.json')).json();
+            relicsData = await (await fetch('../json/cultural-relics.json')).json();
             return relicsData.filter(relic => 
                 relic.longitude && relic.latitude &&
                 !isNaN(relic.longitude) && !isNaN(relic.latitude)
@@ -85,7 +85,7 @@
         }
 
         async function loadRouteData() {
-            routeData = await (await fetch('./json/route-data.json')).json();
+            routeData = await (await fetch('../json/route-data.json')).json();
             return routeData;
         }
 
@@ -323,7 +323,7 @@
         };
 
         async function loadDynastyRelics(dynasty) {
-            const relics = await (await fetch('./json/cultural-relics.json')).json();
+            const relics = await (await fetch('../json/cultural-relics.json')).json();
             return relics.filter(relic => {
                 const rawDynasty = relic.era || '未知';
                 return dynastyMap[rawDynasty] === dynasty;
@@ -331,7 +331,7 @@
         }
 
         async function loadDynastyData() {
-            const relics = await (await fetch('./json/cultural-relics.json')).json();
+            const relics = await (await fetch('../json/cultural-relics.json')).json();
             
             // 朝代时间范围数据
             const dynastyPeriods = {
