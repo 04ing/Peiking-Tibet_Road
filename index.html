@@ -439,35 +439,126 @@
         }
         
         function shareToQQ() {
-            alert('分享到QQ功能已触发');
-            // 实际项目中，这里可以调用QQ分享API
-            const url = encodeURIComponent(window.location.href);
-            const title = encodeURIComponent('京藏古道人文环境时空信息开放平台');
-            const summary = encodeURIComponent('探索元代北京至西藏的驿路文明');
-            window.open('https://connect.qq.com/widget/shareqq/index.html?url=' + url + '&title=' + title + '&summary=' + summary);
+            showShareModal('QQ分享');
             console.log('分享到QQ');
         }
         
         function shareToDouyin() {
-            alert('分享到抖音功能已触发');
-            // 抖音分享需要通过抖音开放平台API实现
+            showShareModal('抖音分享');
             console.log('分享到抖音');
-            // 模拟抖音分享功能
-            const shareContent = '探索元代北京至西藏的驿路文明 - 京藏古道人文环境时空信息开放平台';
-            navigator.clipboard.writeText(shareContent).then(function() {
-                alert('抖音分享文案已复制到剪贴板，请打开抖音粘贴分享');
-            });
         }
         
         function shareToXiaoHongShu() {
-            alert('分享到小红书功能已触发');
-            // 小红书分享需要通过小红书开放平台API实现
+            showShareModal('小红书分享');
             console.log('分享到小红书');
-            // 模拟小红书分享功能
-            const shareContent = '探索元代北京至西藏的驿路文明\n京藏古道人文环境时空信息开放平台\n\n跟随我们一起探索这条古老的驿路，感受历史的魅力！';
-            navigator.clipboard.writeText(shareContent).then(function() {
-                alert('小红书分享文案已复制到剪贴板，请打开小红书粘贴分享');
-            });
+        }
+        
+        // 显示分享模态框
+        function showShareModal(platform) {
+            // 创建分享容器
+            const shareContainer = document.createElement('div');
+            shareContainer.id = 'share-container';
+            shareContainer.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            // 创建分享内容
+            const shareContent = document.createElement('div');
+            shareContent.style.cssText = `
+                background-color: white;
+                padding: 30px;
+                border-radius: 10px;
+                text-align: center;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+                max-width: 400px;
+            `;
+            
+            // 添加标题
+            const shareTitle = document.createElement('h3');
+            shareTitle.textContent = platform;
+            shareTitle.style.marginBottom = '20px';
+            shareContent.appendChild(shareTitle);
+            
+            // 添加分享链接
+            const shareLink = document.createElement('div');
+            shareLink.style.marginBottom = '20px';
+            
+            const linkLabel = document.createElement('p');
+            linkLabel.textContent = '分享链接：';
+            linkLabel.style.marginBottom = '10px';
+            shareLink.appendChild(linkLabel);
+            
+            const linkInput = document.createElement('input');
+            linkInput.type = 'text';
+            linkInput.value = 'https://04ing.github.io/Peking-Tibet_Road/';
+            linkInput.style.cssText = `
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                marginBottom: 10px;
+                font-size: 14px;
+            `;
+            linkInput.readOnly = true;
+            shareLink.appendChild(linkInput);
+            
+            const copyButton = document.createElement('button');
+            copyButton.textContent = '复制链接';
+            copyButton.style.cssText = `
+                padding: 8px 16px;
+                background-color: #8B4513;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+            `;
+            copyButton.onclick = function() {
+                linkInput.select();
+                document.execCommand('copy');
+                alert('链接已复制到剪贴板，请在' + platform.replace('分享', '') + '中粘贴分享');
+            };
+            shareLink.appendChild(copyButton);
+            
+            shareContent.appendChild(shareLink);
+            
+            // 添加分享提示
+            const shareHint = document.createElement('p');
+            shareHint.textContent = '请复制以上链接，在' + platform.replace('分享', '') + '中粘贴分享给好友或分享到动态';
+            shareHint.style.marginBottom = '20px';
+            shareHint.style.fontSize = '14px';
+            shareHint.style.color = '#666';
+            shareContent.appendChild(shareHint);
+            
+            // 添加关闭按钮
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '关闭';
+            closeButton.style.cssText = `
+                padding: 10px 20px;
+                background-color: #8B4513;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            `;
+            closeButton.onclick = function() {
+                document.body.removeChild(shareContainer);
+            };
+            shareContent.appendChild(closeButton);
+            
+            // 组装并添加到页面
+            shareContainer.appendChild(shareContent);
+            document.body.appendChild(shareContainer);
         }
         
         // 搜索功能
