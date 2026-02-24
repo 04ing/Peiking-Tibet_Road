@@ -449,14 +449,14 @@ window.addEventListener('DOMContentLoaded', function() {
     addAnimationClasses();
 });
 
-// 提取地理数据功能
-function extractGeographicData() {
-    const url = 'http://119.78.100.166/qzlab/Ancient-roads?type=jzgd';
+// 从后端API获取古道数据
+function fetchRoadData() {
+    const url = '/api/roads';
     const loadingElement = document.getElementById('data-loading');
     const resultElement = document.getElementById('data-result');
     
     if (loadingElement) {
-        loadingElement.textContent = '正在提取地理数据...';
+        loadingElement.textContent = '正在获取古道数据...';
     }
     
     if (resultElement) {
@@ -473,39 +473,115 @@ function extractGeographicData() {
         })
         .then(data => {
             // 处理获取到的数据
-            console.log('获取到的地理数据:', data);
+            console.log('获取到的古道数据:', data);
             
             // 保存数据到本地存储，以便后续使用
-            localStorage.setItem('jzgdGeographicData', JSON.stringify(data));
+            localStorage.setItem('jzgdRoadData', JSON.stringify(data));
             
             // 显示成功消息
             if (loadingElement) {
-                loadingElement.textContent = '数据提取成功！';
+                loadingElement.textContent = '数据获取成功！';
             }
             
             if (resultElement) {
-                resultElement.textContent = '地理数据已成功提取并保存到本地存储。';
+                resultElement.textContent = '古道数据已成功获取并保存到本地存储。';
                 // 显示数据预览
                 resultElement.innerHTML += '<h4>数据预览：</h4>';
                 resultElement.innerHTML += '<pre>' + JSON.stringify(data, null, 2).substring(0, 500) + '...</pre>';
             }
             
             // 触发数据处理完成事件
-            const event = new CustomEvent('geographicDataExtracted', { detail: data });
+            const event = new CustomEvent('roadDataFetched', { detail: data });
             window.dispatchEvent(event);
         })
         .catch(error => {
-            console.error('提取地理数据时出错:', error);
+            console.error('获取古道数据时出错:', error);
             
             // 显示错误消息
             if (loadingElement) {
-                loadingElement.textContent = '数据提取失败！';
+                loadingElement.textContent = '数据获取失败！';
             }
             
             if (resultElement) {
-                resultElement.textContent = '无法从指定URL获取数据，可能存在跨域限制。请尝试在浏览器中直接访问该URL，然后手动复制数据。';
+                resultElement.textContent = '无法从后端API获取数据，请检查网络连接和后端服务状态。';
             }
         });
+}
+
+// 从后端API获取文化遗产数据
+function fetchHeritageData() {
+    const url = '/api/heritages';
+    
+    // 尝试使用fetch API获取数据
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('获取到的文化遗产数据:', data);
+            // 保存数据到本地存储，以便后续使用
+            localStorage.setItem('jzgdHeritageData', JSON.stringify(data));
+            return data;
+        })
+        .catch(error => {
+            console.error('获取文化遗产数据时出错:', error);
+            return null;
+        });
+}
+
+// 从后端API获取历史事件数据
+function fetchEventData() {
+    const url = '/api/events';
+    
+    // 尝试使用fetch API获取数据
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('获取到的历史事件数据:', data);
+            // 保存数据到本地存储，以便后续使用
+            localStorage.setItem('jzgdEventData', JSON.stringify(data));
+            return data;
+        })
+        .catch(error => {
+            console.error('获取历史事件数据时出错:', error);
+            return null;
+        });
+}
+
+// 搜索功能
+function searchData(query) {
+    const url = `/api/search?query=${encodeURIComponent(query)}`;
+    
+    // 尝试使用fetch API获取数据
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('搜索结果:', data);
+            return data;
+        })
+        .catch(error => {
+            console.error('搜索数据时出错:', error);
+            return null;
+        });
+}
+
+// 提取地理数据功能（兼容旧版）
+function extractGeographicData() {
+    // 调用新的获取古道数据函数
+    fetchRoadData();
 }
 
 // 初始化数据提取功能
@@ -516,7 +592,523 @@ function initDataExtraction() {
     }
 }
 
+// 初始化数据获取功能
+function initDataFetching() {
+    // 自动获取古道数据
+    fetchRoadData();
+    
+    // 自动获取文化遗产数据
+    fetchHeritageData();
+    
+    // 自动获取历史事件数据
+    fetchEventData();
+}
+
+// 登录注册功能
+
+// 显示登录模态框
+function showLoginModal() {
+    // 创建登录容器
+    const loginContainer = document.createElement('div');
+    loginContainer.id = 'login-container';
+    loginContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    // 创建登录内容
+    const loginContent = document.createElement('div');
+    loginContent.style.cssText = `
+        background-color: white;
+        padding: 40px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 100%;
+    `;
+    
+    // 添加标题
+    const loginTitle = document.createElement('h3');
+    loginTitle.textContent = '用户登录';
+    loginTitle.style.marginBottom = '30px';
+    loginContent.appendChild(loginTitle);
+    
+    // 添加登录表单
+    const loginForm = document.createElement('form');
+    loginForm.id = 'login-form';
+    loginForm.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    `;
+    
+    // 添加邮箱输入
+    const emailInput = document.createElement('div');
+    emailInput.innerHTML = `
+        <label for="login-email">邮箱：</label>
+        <input type="email" id="login-email" name="email" required style="
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        ">
+    `;
+    loginForm.appendChild(emailInput);
+    
+    // 添加密码输入
+    const passwordInput = document.createElement('div');
+    passwordInput.innerHTML = `
+        <label for="login-password">密码：</label>
+        <input type="password" id="login-password" name="password" required style="
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        ">
+    `;
+    loginForm.appendChild(passwordInput);
+    
+    // 添加错误信息显示
+    const errorMessage = document.createElement('div');
+    errorMessage.id = 'login-error';
+    errorMessage.style.cssText = `
+        color: red;
+        margin-top: 10px;
+        font-size: 14px;
+    `;
+    loginForm.appendChild(errorMessage);
+    
+    // 添加提交按钮
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.textContent = '登录';
+    submitButton.style.cssText = `
+        padding: 12px;
+        background-color: #8B4513;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+    `;
+    loginForm.appendChild(submitButton);
+    
+    // 添加注册链接
+    const registerLink = document.createElement('div');
+    registerLink.innerHTML = `
+        <p>还没有账号？<a href="javascript:void(0)" id="switch-to-register">立即注册</a></p>
+    `;
+    registerLink.style.marginTop = '20px';
+    loginForm.appendChild(registerLink);
+    
+    // 添加关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.textContent = '关闭';
+    closeButton.style.cssText = `
+        padding: 10px 20px;
+        background-color: #666;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 10px;
+    `;
+    closeButton.onclick = function() {
+        document.body.removeChild(loginContainer);
+    };
+    loginForm.appendChild(closeButton);
+    
+    loginContent.appendChild(loginForm);
+    loginContainer.appendChild(loginContent);
+    document.body.appendChild(loginContainer);
+    
+    // 切换到注册模态框
+    document.getElementById('switch-to-register').addEventListener('click', function() {
+        document.body.removeChild(loginContainer);
+        showRegisterModal();
+    });
+    
+    // 处理登录表单提交
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleLogin();
+    });
+}
+
+// 显示注册模态框
+function showRegisterModal() {
+    // 创建注册容器
+    const registerContainer = document.createElement('div');
+    registerContainer.id = 'register-container';
+    registerContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    // 创建注册内容
+    const registerContent = document.createElement('div');
+    registerContent.style.cssText = `
+        background-color: white;
+        padding: 40px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 100%;
+    `;
+    
+    // 添加标题
+    const registerTitle = document.createElement('h3');
+    registerTitle.textContent = '用户注册';
+    registerTitle.style.marginBottom = '30px';
+    registerContent.appendChild(registerTitle);
+    
+    // 添加注册表单
+    const registerForm = document.createElement('form');
+    registerForm.id = 'register-form';
+    registerForm.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    `;
+    
+    // 添加用户名输入
+    const usernameInput = document.createElement('div');
+    usernameInput.innerHTML = `
+        <label for="register-username">用户名：</label>
+        <input type="text" id="register-username" name="username" required style="
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        ">
+    `;
+    registerForm.appendChild(usernameInput);
+    
+    // 添加邮箱输入
+    const emailInput = document.createElement('div');
+    emailInput.innerHTML = `
+        <label for="register-email">邮箱：</label>
+        <input type="email" id="register-email" name="email" required style="
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        ">
+    `;
+    registerForm.appendChild(emailInput);
+    
+    // 添加密码输入
+    const passwordInput = document.createElement('div');
+    passwordInput.innerHTML = `
+        <label for="register-password">密码：</label>
+        <input type="password" id="register-password" name="password" required style="
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        ">
+    `;
+    registerForm.appendChild(passwordInput);
+    
+    // 添加错误信息显示
+    const errorMessage = document.createElement('div');
+    errorMessage.id = 'register-error';
+    errorMessage.style.cssText = `
+        color: red;
+        margin-top: 10px;
+        font-size: 14px;
+    `;
+    registerForm.appendChild(errorMessage);
+    
+    // 添加提交按钮
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.textContent = '注册';
+    submitButton.style.cssText = `
+        padding: 12px;
+        background-color: #8B4513;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+    `;
+    registerForm.appendChild(submitButton);
+    
+    // 添加登录链接
+    const loginLink = document.createElement('div');
+    loginLink.innerHTML = `
+        <p>已有账号？<a href="javascript:void(0)" id="switch-to-login">立即登录</a></p>
+    `;
+    loginLink.style.marginTop = '20px';
+    registerForm.appendChild(loginLink);
+    
+    // 添加关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.textContent = '关闭';
+    closeButton.style.cssText = `
+        padding: 10px 20px;
+        background-color: #666;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 10px;
+    `;
+    closeButton.onclick = function() {
+        document.body.removeChild(registerContainer);
+    };
+    registerForm.appendChild(closeButton);
+    
+    registerContent.appendChild(registerForm);
+    registerContainer.appendChild(registerContent);
+    document.body.appendChild(registerContainer);
+    
+    // 切换到登录模态框
+    document.getElementById('switch-to-login').addEventListener('click', function() {
+        document.body.removeChild(registerContainer);
+        showLoginModal();
+    });
+    
+    // 处理注册表单提交
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleRegister();
+    });
+}
+
+// 处理登录表单提交
+async function handleLogin() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const errorElement = document.getElementById('login-error');
+    
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // 登录成功，保存token和用户信息
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // 更新UI
+            updateUserUI(data.user);
+            
+            // 关闭登录模态框
+            document.body.removeChild(document.getElementById('login-container'));
+            
+            // 显示成功消息
+            alert('登录成功！');
+        } else {
+            // 登录失败，显示错误信息
+            errorElement.textContent = data.message || '登录失败，请检查邮箱和密码';
+        }
+    } catch (error) {
+        console.error('登录错误:', error);
+        errorElement.textContent = '登录失败，请检查网络连接';
+    }
+}
+
+// 处理注册表单提交
+async function handleRegister() {
+    const username = document.getElementById('register-username').value;
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    const errorElement = document.getElementById('register-error');
+    
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // 注册成功，保存token和用户信息
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // 更新UI
+            updateUserUI(data.user);
+            
+            // 关闭注册模态框
+            document.body.removeChild(document.getElementById('register-container'));
+            
+            // 显示成功消息
+            alert('注册成功！');
+        } else {
+            // 注册失败，显示错误信息
+            errorElement.textContent = data.message || '注册失败，请稍后重试';
+        }
+    } catch (error) {
+        console.error('注册错误:', error);
+        errorElement.textContent = '注册失败，请检查网络连接';
+    }
+}
+
+// 处理登出
+function handleLogout() {
+    // 清除localStorage中的token和用户信息
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // 更新UI
+    updateUserUI(null);
+    
+    // 显示成功消息
+    alert('登出成功！');
+}
+
+// 更新用户UI
+function updateUserUI(user) {
+    const loginButtons = document.getElementById('login-buttons');
+    const userMenu = document.getElementById('user-menu');
+    const usernameDisplay = document.getElementById('username-display');
+    
+    if (user) {
+        // 显示用户菜单
+        loginButtons.style.display = 'none';
+        userMenu.style.display = 'block';
+        usernameDisplay.textContent = user.username;
+    } else {
+        // 显示登录注册按钮
+        loginButtons.style.display = 'block';
+        userMenu.style.display = 'none';
+    }
+}
+
+// 检查用户登录状态
+function checkLoginStatus() {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+        try {
+            const user = JSON.parse(userStr);
+            updateUserUI(user);
+        } catch (error) {
+            console.error('解析用户信息失败:', error);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+        }
+    }
+}
+
+// 初始化下拉菜单功能
+function initDropdowns() {
+    // 绑定所有下拉按钮的点击事件
+    const dropdownButtons = document.querySelectorAll('.dropdown-toggle');
+    dropdownButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const dropdownMenu = this.nextElementSibling;
+            if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+                // 切换下拉菜单的显示状态
+                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+            }
+        });
+    });
+    
+    // 点击页面其他地方关闭下拉菜单
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.dropdown')) {
+            const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+            dropdownMenus.forEach(menu => {
+                menu.style.display = 'none';
+            });
+        }
+    });
+}
+
+// 初始化用户相关功能
+function initUserAuth() {
+    // 检查登录状态
+    checkLoginStatus();
+    
+    // 初始化下拉菜单
+    initDropdowns();
+    
+    // 绑定登录按钮点击事件
+    const loginButton = document.getElementById('login-button');
+    if (loginButton) {
+        loginButton.addEventListener('click', function() {
+            // 关闭下拉菜单
+            const dropdownMenu = this.closest('.dropdown-menu');
+            if (dropdownMenu) {
+                dropdownMenu.style.display = 'none';
+            }
+            showLoginModal();
+        });
+    }
+    
+    // 绑定注册按钮点击事件
+    const registerButton = document.getElementById('register-button');
+    if (registerButton) {
+        registerButton.addEventListener('click', function() {
+            // 关闭下拉菜单
+            const dropdownMenu = this.closest('.dropdown-menu');
+            if (dropdownMenu) {
+                dropdownMenu.style.display = 'none';
+            }
+            showRegisterModal();
+        });
+    }
+    
+    // 绑定登出按钮点击事件
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function() {
+            // 关闭下拉菜单
+            const dropdownMenu = this.closest('.dropdown-menu');
+            if (dropdownMenu) {
+                dropdownMenu.style.display = 'none';
+            }
+            handleLogout();
+        });
+    }
+}
+
 // 在页面加载完成后初始化数据提取功能
 window.addEventListener('load', function() {
     initDataExtraction();
+    initDataFetching();
+    initUserAuth();
 });

@@ -17,6 +17,27 @@
                 <li><a href="pages/travel.html" id="nav-travel">旅游攻略</a></li>
                 <li><a href="#about" id="nav-about">关于平台</a></li>
             </ul>
+            <div class="user-container">
+                <div id="login-buttons">
+                    <div class="dropdown">
+                        <button id="user-dropdown-button" class="btn-primary dropdown-toggle">用户</button>
+                        <div class="dropdown-menu" style="display: none;">
+                            <button id="login-button" class="dropdown-item">登录</button>
+                            <button id="register-button" class="dropdown-item">注册</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="user-menu" style="display: none;">
+                    <div class="dropdown">
+                        <button id="user-dropdown-button" class="btn-primary dropdown-toggle">
+                            <span id="username-display"></span>
+                        </button>
+                        <div class="dropdown-menu" style="display: none;">
+                            <button id="logout-button" class="dropdown-item">登出</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="搜索...">
                 <button id="search-button"><i class="fas fa-search"></i></button>
