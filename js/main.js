@@ -94,57 +94,282 @@ const researchItems = document.querySelectorAll('.research-item');
 });
 
 // 地图控制交互
-const mapCheckboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
-mapCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        // 控制地图图层显示/隐藏的逻辑
-        console.log(`${this.id} ${this.checked ? 'checked' : 'unchecked'}`);
-        
-        // 根据复选框ID控制不同图层
-        if (window.amap) {
-            if (this.id === 'layer-route') {
-                // 控制路线图层
-                if (window.amapPolyline) {
-                    if (this.checked) {
-                        window.amapPolyline.setMap(window.amap);
+function initMapControls() {
+    // 图层控制
+    const mapCheckboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+    mapCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            // 控制地图图层显示/隐藏的逻辑
+            console.log(`${this.id} ${this.checked ? 'checked' : 'unchecked'}`);
+            
+            // 根据复选框ID控制不同图层
+            if (window.amap) {
+                if (this.id === 'layer-route') {
+                    // 控制路线图层
+                    if (window.amapPolyline) {
+                        if (this.checked) {
+                            window.amapPolyline.setMap(window.amap);
+                        } else {
+                            window.amapPolyline.setMap(null);
+                        }
+                    }
+                } else if (this.id === 'layer-station') {
+                    // 控制驿站标记
+                    if (window.amapMarkers) {
+                        window.amapMarkers.forEach(marker => {
+                            if (this.checked) {
+                                marker.setMap(window.amap);
+                            } else {
+                                marker.setMap(null);
+                            }
+                        });
+                    }
+                } else if (this.id === 'layer-landmark') {
+                    // 控制历史地标
+                    if (window.landmarkMarkers) {
+                        window.landmarkMarkers.forEach(marker => {
+                            if (this.checked) {
+                                marker.setMap(window.amap);
+                            } else {
+                                marker.setMap(null);
+                            }
+                        });
                     } else {
-                        window.amapPolyline.setMap(null);
+                        // 初始化历史地标标记
+                        initLandmarkMarkers();
+                        if (this.checked && window.landmarkMarkers) {
+                            window.landmarkMarkers.forEach(marker => marker.setMap(window.amap));
+                        }
                     }
                 }
-            } else if (this.id === 'layer-station') {
-                // 控制驿站标记
-                if (window.amapMarkers) {
-                    window.amapMarkers.forEach(marker => {
-                        if (this.checked) {
-                            marker.setMap(window.amap);
-                        } else {
-                            marker.setMap(null);
-                        }
-                    });
-                }
-            } else if (this.id === 'layer-landmark') {
-                // 控制历史地标
-                // 这里可以添加历史地标图层的控制逻辑
-                console.log('Landmark layer control not implemented yet');
             }
-        }
+        });
     });
-});
+    
+    // 路线规划功能
+    const planRouteBtn = document.getElementById('plan-route-btn');
+    if (planRouteBtn) {
+        planRouteBtn.addEventListener('click', function() {
+            planRoute();
+        });
+    }
+    
+    // 历史地图图层
+    const historicalMapSelect = document.getElementById('historical-map');
+    if (historicalMapSelect) {
+        historicalMapSelect.addEventListener('change', function() {
+            updateHistoricalMapLayer(this.value);
+        });
+    }
+    
 
-// 时间范围选择交互
-const timeSelect = document.querySelector('.control-group select');
-if (timeSelect) {
-    timeSelect.addEventListener('change', function() {
-        // 时间范围变化的逻辑
-        console.log(`Selected time: ${this.value}`);
-        
-        // 根据选择的时间范围更新地图显示
-        // 这里可以添加不同时期路线的显示逻辑
-        if (window.amap) {
-            console.log(`Updating map for time period: ${this.value}`);
-            // 示例：可以根据不同时期显示不同的路线样式或数据
+}
+
+
+
+// 初始化历史地标标记
+function initLandmarkMarkers() {
+    if (!window.amap) return;
+    
+    // 历史地标数据
+    const landmarks = [
+        {
+            name: '居庸关',
+            location: [116.1289, 40.3571],
+            description: '元代重要关隘，京藏古道的重要节点',
+            type: '关隘'
+        },
+        {
+            name: '大昭寺',
+            location: [91.1170, 29.6500],
+            description: '拉萨著名寺庙，元代西藏宗教中心',
+            type: '宗教建筑'
+        },
+        {
+            name: '元大都遗址',
+            location: [116.4074, 39.9042],
+            description: '元代都城遗址，京藏古道起点',
+            type: '都城'
+        },
+        {
+            name: '塔尔寺',
+            location: [101.7780, 36.6232],
+            description: '青海著名佛教寺院，京藏古道重要宗教场所',
+            type: '宗教建筑'
         }
+    ];
+    
+    // 创建地标标记
+    window.landmarkMarkers = landmarks.map(landmark => {
+        const marker = new AMap.Marker({
+            position: landmark.location,
+            title: landmark.name,
+            icon: new AMap.Icon({
+                size: new AMap.Size(30, 30),
+                image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_r.png',
+                imageSize: new AMap.Size(30, 30)
+            })
+        });
+        
+        // 添加点击事件
+        marker.on('click', function() {
+            const content = `
+                <div style="padding: 10px; max-width: 300px;">
+                    <h3 style="color: #8B4513; margin-bottom: 10px;">${landmark.name}</h3>
+                    <p><strong>类型：</strong>${landmark.type}</p>
+                    <p><strong>描述：</strong>${landmark.description}</p>
+                </div>
+            `;
+            
+            const infoWindow = new AMap.InfoWindow({
+                content: content,
+                offset: new AMap.Pixel(0, -30)
+            });
+            
+            infoWindow.open(window.amap, landmark.location);
+        });
+        
+        return marker;
     });
+}
+
+// 路线规划功能
+function planRoute() {
+    const startPoint = document.getElementById('start-point').value;
+    const endPoint = document.getElementById('end-point').value;
+    const resultDiv = document.getElementById('route-result');
+    
+    if (!startPoint || !endPoint) {
+        resultDiv.innerHTML = '<p style="color: red;">请选择起点和终点</p>';
+        resultDiv.style.display = 'block';
+        return;
+    }
+    
+    // 解析坐标
+    const startCoords = startPoint.split(',').map(Number);
+    const endCoords = endPoint.split(',').map(Number);
+    
+    // 计算两点之间的距离（简化计算）
+    const distance = calculateDistance(startCoords, endCoords);
+    
+    // 生成路线信息
+    const startName = document.getElementById('start-point').options[document.getElementById('start-point').selectedIndex].text;
+    const endName = document.getElementById('end-point').options[document.getElementById('end-point').selectedIndex].text;
+    
+    // 显示路线结果
+    resultDiv.innerHTML = `
+        <h4>路线规划结果</h4>
+        <p><strong>起点：</strong>${startName}</p>
+        <p><strong>终点：</strong>${endName}</p>
+        <p><strong>距离：</strong>${distance.toFixed(2)} 公里</p>
+        <p><strong>预计行程时间：</strong>${Math.ceil(distance / 50)} 天（按每天50公里计算）</p>
+        <p><strong>路线节点：</strong></p>
+        <ul>
+            ${getRouteNodes(startName, endName).map(node => `<li>${node}</li>`).join('')}
+        </ul>
+    `;
+    resultDiv.style.display = 'block';
+    
+    // 在地图上显示规划的路线
+    if (window.amap) {
+        // 清除旧的规划路线
+        if (window.plannedRoute) {
+            window.plannedRoute.setMap(null);
+        }
+        
+        // 创建新的规划路线
+        window.plannedRoute = new AMap.Polyline({
+            path: [startCoords, endCoords],
+            strokeColor: '#FF0000',
+            strokeWeight: 4,
+            strokeOpacity: 0.8,
+            strokeStyle: 'dashed'
+        });
+        
+        window.plannedRoute.setMap(window.amap);
+        
+        // 调整地图视野
+        window.amap.setFitView([window.plannedRoute]);
+    }
+}
+
+// 计算两点之间的距离（简化版）
+function calculateDistance(coord1, coord2) {
+    const R = 6371; // 地球半径（公里）
+    const dLat = toRad(coord2[1] - coord1[1]);
+    const dLon = toRad(coord2[0] - coord1[0]);
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(toRad(coord1[1])) * Math.cos(toRad(coord2[1])) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+function toRad(deg) {
+    return deg * (Math.PI/180);
+}
+
+// 获取路线节点
+function getRouteNodes(start, end) {
+    const allNodes = ['北京', '张家口', '大同', '呼和浩特', '银川', '西宁', '拉萨'];
+    const startIndex = allNodes.indexOf(start);
+    const endIndex = allNodes.indexOf(end);
+    
+    if (startIndex < endIndex) {
+        return allNodes.slice(startIndex, endIndex + 1);
+    } else {
+        return allNodes.slice(endIndex, startIndex + 1).reverse();
+    }
+}
+
+// 更新历史地图图层
+function updateHistoricalMapLayer(mapType) {
+    if (!window.amap) return;
+    
+    // 移除旧的历史地图图层
+    if (window.historicalMapLayer) {
+        window.historicalMapLayer.setMap(null);
+        window.historicalMapLayer = null;
+    }
+    
+    if (mapType === 'none') return;
+    
+    // 中華文明之時空基礎架構瓦片服务
+    let historicalLayerUrl;
+    
+    switch(mapType) {
+        case 'yuan':
+            historicalLayerUrl = 'https://gis.sinica.edu.tw/ccts/file-exists.php?img=ad1330-png-'; // 元代历史地图 (1330年)
+            break;
+        case 'ming':
+            historicalLayerUrl = 'https://gis.sinica.edu.tw/ccts/file-exists.php?img=ad1582-png-'; // 明代历史地图 (1582年)
+            break;
+        case 'qing':
+            historicalLayerUrl = 'https://gis.sinica.edu.tw/ccts/file-exists.php?img=ad1820-png-'; // 清代历史地图 (1820年)
+            break;
+        default:
+            return;
+    }
+    
+    console.log(`Adding historical map layer: ${mapType}`);
+    
+    // 创建自定义瓦片图层
+    window.historicalMapLayer = new AMap.TileLayer({
+        getTileUrl: function(x, y, z) {
+            // 转换瓦片坐标，适配不同的瓦片服务
+            return historicalLayerUrl + z + '-' + x + '-' + y;
+        },
+        tileSize: 256,
+        zooms: [3, 10],
+        opacity: 0.6,
+        zIndex: 10
+    });
+    
+    // 添加到地图
+    window.historicalMapLayer.setMap(window.amap);
+    
+    // 显示提示信息
+    alert(`已添加${mapType === 'yuan' ? '元代' : mapType === 'ming' ? '明代' : '清代'}历史地图图层`);
 }
 
 // 页面加载完成后执行
@@ -167,6 +392,9 @@ window.addEventListener('load', function() {
     
     // 初始化高德地图
     initAmap();
+    
+    // 初始化地图控制
+    initMapControls();
     
     // 初始化滚动动画
     initScrollAnimations();
@@ -327,6 +555,8 @@ function initAmap() {
         window.amap = map;
         window.amapMarkers = markers;
         window.amapPolyline = polyline;
+        
+
         
         console.log('AMap initialized successfully');
     } catch (error) {
@@ -709,6 +939,20 @@ function showRegisterModal() {
     `;
     registerForm.appendChild(passwordInput);
     
+    // 添加密码确认输入
+    const confirmPasswordInput = document.createElement('div');
+    confirmPasswordInput.innerHTML = `
+        <label for="register-confirm-password">确认密码：</label>
+        <input type="password" id="register-confirm-password" name="confirmPassword" required style="
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        ">
+    `;
+    registerForm.appendChild(confirmPasswordInput);
+    
     // 添加错误信息显示
     const errorMessage = document.createElement('div');
     errorMessage.id = 'register-error';
@@ -780,7 +1024,7 @@ function showRegisterModal() {
 }
 
 // 处理登录表单提交
-async function handleLogin() {
+function handleLogin() {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     const errorElement = document.getElementById('login-error');
@@ -799,63 +1043,54 @@ async function handleLogin() {
             return;
         }
         
-        const response = await fetch('http://localhost:3000/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
+        // 从localStorage获取用户数据
+        const users = JSON.parse(localStorage.getItem('users')) || [];
         
-        // 检查响应状态
-        if (!response.ok) {
-            // 尝试解析错误响应
-            try {
-                const errorData = await response.json();
-                errorElement.textContent = errorData.message || '登录失败，请检查邮箱和密码';
-            } catch (e) {
-                // 如果响应不是有效的JSON
-                errorElement.textContent = '登录失败，请检查网络连接';
-            }
+        // 查找用户
+        const user = users.find(user => user.email === email);
+        if (!user) {
+            errorElement.textContent = '邮箱或密码错误';
             return;
         }
         
-        // 尝试解析成功响应
-        try {
-            const data = await response.json();
-            
-            // 登录成功，保存token和用户信息
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            
-            // 更新UI
-            updateUserUI(data.user);
-            
-            // 关闭登录模态框
-            document.body.removeChild(document.getElementById('login-container'));
-            
-            // 显示成功消息
-            alert('登录成功！');
-        } catch (e) {
-            console.error('解析响应失败:', e);
-            errorElement.textContent = '登录失败，请稍后重试';
+        // 验证密码
+        if (user.password !== password) {
+            errorElement.textContent = '邮箱或密码错误';
+            return;
         }
+        
+        // 生成模拟token
+        const token = 'mock-token-' + Date.now();
+        
+        // 登录成功，保存token和用户信息
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        // 更新UI
+        updateUserUI(user);
+        
+        // 关闭登录模态框
+        document.body.removeChild(document.getElementById('login-container'));
+        
+        // 显示成功消息
+        alert('登录成功！');
     } catch (error) {
         console.error('登录错误:', error);
-        errorElement.textContent = '登录失败，请检查网络连接';
+        errorElement.textContent = '登录失败，请稍后重试';
     }
 }
 
 // 处理注册表单提交
-async function handleRegister() {
+function handleRegister() {
     const username = document.getElementById('register-username').value;
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
+    const confirmPassword = document.getElementById('register-confirm-password').value;
     const errorElement = document.getElementById('register-error');
     
     try {
         // 验证表单数据
-        if (!username || !email || !password) {
+        if (!username || !email || !password || !confirmPassword) {
             errorElement.textContent = '请填写所有必填字段';
             return;
         }
@@ -873,50 +1108,53 @@ async function handleRegister() {
             return;
         }
         
-        const response = await fetch('http://localhost:3000/api/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, email, password })
-        });
-        
-        // 检查响应状态
-        if (!response.ok) {
-            // 尝试解析错误响应
-            try {
-                const errorData = await response.json();
-                errorElement.textContent = errorData.message || '注册失败，请稍后重试';
-            } catch (e) {
-                // 如果响应不是有效的JSON
-                errorElement.textContent = '注册失败，请检查网络连接';
-            }
+        // 验证密码一致性
+        if (password !== confirmPassword) {
+            errorElement.textContent = '两次输入的密码不一致';
             return;
         }
         
-        // 尝试解析成功响应
-        try {
-            const data = await response.json();
-            
-            // 注册成功，保存token和用户信息
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            
-            // 更新UI
-            updateUserUI(data.user);
-            
-            // 关闭注册模态框
-            document.body.removeChild(document.getElementById('register-container'));
-            
-            // 显示成功消息
-            alert('注册成功！');
-        } catch (e) {
-            console.error('解析响应失败:', e);
-            errorElement.textContent = '注册失败，请稍后重试';
+        // 从localStorage获取用户数据
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        
+        // 检查邮箱是否已存在
+        const existingUser = users.find(user => user.email === email);
+        if (existingUser) {
+            errorElement.textContent = '邮箱已存在';
+            return;
         }
+        
+        // 创建新用户
+        const newUser = {
+            id: 'user-' + Date.now(),
+            username: username,
+            email: email,
+            password: password,
+            role: 'user'
+        };
+        
+        // 保存用户到localStorage
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        // 生成模拟token
+        const token = 'mock-token-' + Date.now();
+        
+        // 注册成功，保存token和用户信息
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(newUser));
+        
+        // 更新UI
+        updateUserUI(newUser);
+        
+        // 关闭注册模态框
+        document.body.removeChild(document.getElementById('register-container'));
+        
+        // 显示成功消息
+        alert('注册成功！');
     } catch (error) {
         console.error('注册错误:', error);
-        errorElement.textContent = '注册失败，请检查网络连接';
+        errorElement.textContent = '注册失败，请稍后重试';
     }
 }
 

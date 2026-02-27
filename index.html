@@ -11,7 +11,7 @@
     <!-- 高德地图API -->
     <!-- 请注册并获取真实的API密钥，替换下面的key值 -->
     <!-- 注册地址：https://lbs.amap.com/dev/key/app -->
-    <script src="https://webapi.amap.com/maps?v=2.0&key=fe4e50125495ae9967861058e720c5dd"></script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=fe4e50125495ae9967861058e720c5dd&plugin=AMap.Scale,AMap.ToolBar"></script>
 </head>
 <body>
     <!-- 导航栏容器 -->
@@ -113,16 +113,72 @@
                 <div id="amap-container" class="map-container-amap"></div>
                 <div class="map-controls">
                     <h3>地图控制</h3>
-                    <div class="control-group">
-                        <label>时间范围：</label>
-                        <select>
-                            <option>元代初期</option>
-                            <option>元代中期</option>
-                            <option>元代晚期</option>
-                        </select>
+                    
+                    <!-- 图层控制和历史地图 -->
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <!-- 图层控制 -->
+                        <div class="control-group" style="flex: 1;">
+                            <h4>图层控制</h4>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" id="layer-route" checked> 古道路线</label>
+                                <label><input type="checkbox" id="layer-station" checked> 驿站标记</label>
+                                <label><input type="checkbox" id="layer-landmark"> 历史地标</label>
+                            </div>
+                            <!-- 链接按钮 -->
+                            <div style="margin-top: 15px;">
+                                <a href="http://119.78.100.166/qzlab/Ancient-roads?type=jzgd" class="btn-secondary" target="_blank">查看重建详细地图</a>
+                            </div>
+                        </div>
+                        
+                        <!-- 历史地图图层 -->
+                        <div class="control-group" style="flex: 1;">
+                            <h4>历史地图</h4>
+                            <select id="historical-map">
+                                <option value="none">无历史地图</option>
+                                <option value="yuan">元代地图 (1330年)</option>
+                                <option value="ming">明代地图 (1582年)</option>
+                                <option value="qing">清代地图 (1820年)</option>
+                            </select>
+                            <p style="margin-top: 10px; font-size: 12px; color: #666;">数据来源：中華文明之時空基礎架構</p>
+                            <!-- 链接按钮 -->
+                            <div style="margin-top: 15px;">
+                                <a href="pages/yuan-dynasty-map.html" class="btn-secondary">查看元代地图</a>
+                            </div>
+                        </div>
                     </div>
-                    <a href="http://119.78.100.166/qzlab/Ancient-roads?type=jzgd" class="btn-secondary" target="_blank">查看重建详细地图</a>
-                    <a href="pages/yuan-dynasty-map.html" class="btn-secondary">查看元代地图</a>
+                    
+                    <!-- 路线规划 -->
+                    <div class="control-group">
+                        <h4>路线规划</h4>
+                        <div class="route-planner">
+                            <div class="form-group">
+                                <label>起点：</label>
+                                <select id="start-point">
+                                    <option value="116.4074,39.9042">北京</option>
+                                    <option value="115.5006,40.5847">张家口</option>
+                                    <option value="113.6158,40.8183">大同</option>
+                                    <option value="111.6708,40.8139">呼和浩特</option>
+                                    <option value="106.2782,38.4663">银川</option>
+                                    <option value="101.7780,36.6232">西宁</option>
+                                    <option value="91.1170,29.6657">拉萨</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>终点：</label>
+                                <select id="end-point">
+                                    <option value="91.1170,29.6657">拉萨</option>
+                                    <option value="101.7780,36.6232">西宁</option>
+                                    <option value="106.2782,38.4663">银川</option>
+                                    <option value="111.6708,40.8139">呼和浩特</option>
+                                    <option value="113.6158,40.8183">大同</option>
+                                    <option value="115.5006,40.5847">张家口</option>
+                                    <option value="116.4074,39.9042">北京</option>
+                                </select>
+                            </div>
+                            <button id="plan-route-btn" class="btn-secondary">规划路线</button>
+                        </div>
+                        <div id="route-result" style="margin-top: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; display: none;"></div>
+                    </div>
                 </div>
             </div>
         </div>

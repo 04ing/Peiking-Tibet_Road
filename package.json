@@ -4,7 +4,8 @@
   "description": "Beijing-Tibet Ancient Road Project",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [
     "ancient road",
@@ -33,5 +34,6 @@
   "bugs": {
     "url": "https://github.com/04ing/Peking-Tibet_Road/issues"
   },
-  "homepage": "https://github.com/04ing/Peking-Tibet_Road#readme"
+  "homepage": "https://github.com/04ing/Peking-Tibet_Road#readme",
+  "devDependencies": {}
 }
